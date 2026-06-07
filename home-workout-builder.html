@@ -1,0 +1,2103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home Workout Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f4f0;--surface:#ffffff;--surface2:#efefeb;--border:#e0dfd9;
+  --accent:#ff3d00;--accent2:#ff8c00;--text:#111110;
+  --muted:#888884;--green:#1a8a4a;--blue:#1a5fa8;--purple:#6a3fa8;
+  --ink:#111110;--card-shadow:0 1px 3px rgba(0,0,0,0.08);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:400;min-height:100vh;padding:0 0 100px;}
+
+/* HEADER */
+header{background:var(--ink);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;letter-spacing:0.08em;color:#fff;line-height:1;}
+.logo span{color:var(--accent);}
+.hdr-btn{font-size:0.72rem;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#fff;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);padding:6px 12px;border-radius:20px;cursor:pointer;transition:all 0.15s;}
+.hdr-btn:hover{background:rgba(255,255,255,0.22);}
+
+/* WIZARD */
+#wizard{display:block;}
+#tracker{display:none;}
+.wizard-progress{height:3px;background:var(--border);margin:0;}
+.wizard-progress-fill{height:100%;background:var(--accent);transition:width 0.4s ease;}
+.wizard-body{padding:24px 16px 0;}
+.wizard-step{display:none;}
+.wizard-step.active{display:block;}
+.step-label{font-size:0.68rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+.step-title{font-family:'Bebas Neue',sans-serif;font-size:2.6rem;letter-spacing:0.04em;line-height:1;margin-bottom:6px;color:var(--ink);}
+.step-title span{color:var(--accent);}
+.step-sub{font-size:0.82rem;color:var(--muted);margin-bottom:22px;line-height:1.55;}
+
+/* OPTION CARDS */
+.option-grid{display:flex;flex-direction:column;gap:8px;}
+.option-grid.two-col{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.option-grid.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.opt-card{background:var(--surface);border:2px solid var(--border);border-radius:10px;padding:14px 16px;cursor:pointer;transition:all 0.15s;user-select:none;}
+.opt-card.selected{background:#fff5f2;border-color:var(--accent);}
+.opt-card:hover:not(.selected){border-color:#ccc;}
+.opt-title{font-weight:600;font-size:0.92rem;margin-bottom:3px;color:var(--ink);}
+.opt-sub{font-size:0.73rem;color:var(--muted);line-height:1.4;}
+.opt-card.selected .opt-title{color:var(--accent);}
+
+/* DAY PICKER */
+.day-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:8px;}
+.day-btn{padding:12px 4px;text-align:center;border-radius:10px;border:2px solid var(--border);background:var(--surface);cursor:pointer;user-select:none;transition:all 0.15s;}
+.day-btn .day-name{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:0.06em;color:var(--muted);}
+.day-btn.selected{background:#fff5f2;border-color:var(--accent);}
+.day-btn.selected .day-name{color:var(--accent);}
+.day-count{font-size:0.73rem;color:var(--muted);margin-top:6px;font-weight:500;}
+
+/* FOCUS ROWS */
+.focus-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);}
+.focus-row:last-child{border-bottom:none;}
+.focus-day-label{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:0.06em;min-width:38px;color:var(--muted);}
+.focus-select{flex:1;background:var(--surface);border:2px solid var(--border);color:var(--ink);padding:9px 12px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.82rem;appearance:none;cursor:pointer;}
+.focus-select:focus{outline:none;border-color:var(--accent);}
+
+/* SLIDER */
+.slider-wrap{margin:8px 0 20px;}
+.slider-row{display:flex;align-items:center;gap:14px;}
+.slider{flex:1;-webkit-appearance:none;height:4px;border-radius:2px;background:var(--border);outline:none;}
+.slider::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:var(--accent);cursor:pointer;border:3px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.2);}
+.slider-val{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:0.04em;color:var(--accent);min-width:80px;text-align:right;}
+.slider-label{font-size:0.75rem;color:var(--muted);margin-bottom:6px;font-weight:500;}
+.equip-grid{display:flex;flex-direction:column;gap:8px;}
+
+/* WIZARD NAV */
+.wizard-nav{display:flex;gap:10px;margin-top:28px;}
+.btn-back{flex:0 0 auto;padding:14px 18px;border-radius:8px;border:2px solid var(--border);background:none;color:var(--muted);font-weight:600;font-size:0.82rem;cursor:pointer;transition:all 0.15s;}
+.btn-back:hover{border-color:#bbb;color:var(--ink);}
+.btn-next{flex:1;padding:16px;border-radius:8px;border:none;background:var(--accent);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:0.1em;cursor:pointer;transition:all 0.15s;}
+.btn-next:hover{background:#e03000;}
+.btn-next:disabled{opacity:0.25;cursor:not-allowed;}
+.btn-next.build{background:var(--green);}
+.btn-next.build:hover{background:#167a3e;}
+
+/* TRACKER */
+.week-selector{padding:12px 16px;border-bottom:1px solid var(--border);background:var(--surface);}
+.week-selector-label{font-size:0.65rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+.week-grid{display:grid;gap:4px;}
+.week-btn{padding:7px 2px;text-align:center;cursor:pointer;font-family:'Bebas Neue',sans-serif;font-size:0.85rem;letter-spacing:0.05em;border-radius:5px;border:2px solid var(--border);background:var(--surface2);color:var(--muted);transition:all 0.15s;user-select:none;position:relative;}
+.week-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.week-btn.completed{border-color:var(--green);color:var(--green);background:#f0faf5;}
+.week-btn.completed::after{content:'';width:4px;height:4px;border-radius:50%;background:var(--green);position:absolute;top:3px;right:3px;}
+.week-btn:hover:not(.active){border-color:#bbb;color:var(--ink);}
+
+.prog-banner{margin:12px 16px 0;padding:12px 14px;border-radius:8px;font-size:0.78rem;line-height:1.55;}
+.prog-banner.p1{background:#fff8e6;border:1.5px solid #ffd980;color:#8a6000;}
+.prog-banner.p2{background:#fff3e6;border:1.5px solid #ffb860;color:#8a4000;}
+.prog-banner.p3{background:#f5f0ff;border:1.5px solid #c0a0ff;color:#5020a0;}
+.prog-banner.p4{background:#f0fff5;border:1.5px solid #80d0a0;color:#1a6a3a;}
+
+.phase-badge{font-family:'Bebas Neue',sans-serif;font-size:0.8rem;letter-spacing:0.1em;padding:4px 10px;border-radius:20px;white-space:nowrap;}
+.phase-1{background:#fff8e6;color:#c87800;border:1.5px solid #ffd980;}
+.phase-2{background:#fff3e6;color:#c85000;border:1.5px solid #ffb860;}
+.phase-3{background:#f5f0ff;color:#6030c0;border:1.5px solid #c0a0ff;}
+.phase-4{background:#f0fff5;color:#1a8a4a;border:1.5px solid #80d0a0;}
+
+.tabs{display:flex;border-bottom:2px solid var(--border);overflow-x:auto;scrollbar-width:none;background:var(--surface);}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{flex:1;min-width:60px;padding:13px 4px;text-align:center;cursor:pointer;font-family:'Bebas Neue',sans-serif;font-size:0.9rem;letter-spacing:0.06em;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-2px;transition:all 0.2s;user-select:none;position:relative;}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab:hover:not(.active){color:var(--ink);}
+.tab.done::after{content:'✓';position:absolute;top:4px;right:4px;font-size:0.5rem;color:var(--green);font-family:'DM Sans',sans-serif;}
+.tab.rest-tab{color:#ccc;}
+.tab.rest-tab.active{color:var(--muted);border-bottom-color:var(--muted);}
+
+.content{padding:0 16px;}
+.day-header{padding:18px 0 4px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+.day-name{font-family:'Bebas Neue',sans-serif;font-size:2.8rem;letter-spacing:0.03em;line-height:1;color:var(--ink);}
+.day-focus-tag{font-size:0.72rem;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--accent);}
+.day-note{font-size:0.76rem;color:var(--muted);margin:3px 0 0;line-height:1.5;}
+
+.section-tabs{display:flex;margin:14px 0 0;border:2px solid var(--border);border-radius:8px;overflow:hidden;background:var(--surface2);}
+.section-tab{flex:1;padding:10px 6px;text-align:center;cursor:pointer;font-weight:600;font-size:0.72rem;letter-spacing:0.04em;text-transform:uppercase;color:var(--muted);transition:all 0.18s;user-select:none;}
+.section-tab:not(:last-child){border-right:2px solid var(--border);}
+.section-tab.active-workout{color:var(--accent);background:var(--surface);}
+.section-tab.active-stretch{color:var(--blue);background:var(--surface);}
+
+.circuit-label{font-family:'Bebas Neue',sans-serif;font-size:0.9rem;letter-spacing:0.1em;color:var(--muted);margin:16px 0 8px;display:flex;align-items:center;gap:10px;}
+.circuit-label::after{content:'';flex:1;height:1.5px;background:var(--border);}
+
+.exercises{display:flex;flex-direction:column;gap:8px;}
+.ex-wrap{display:flex;flex-direction:column;}
+.ex-card{background:var(--surface);border:2px solid var(--border);border-radius:10px 10px 0 0;padding:12px 14px;display:flex;align-items:center;gap:12px;position:relative;overflow:hidden;box-shadow:var(--card-shadow);}
+.ex-card.no-exp{border-radius:10px;}
+.ex-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--border);transition:background 0.2s;}
+.ex-card.checked{background:#f5fff8;border-color:#b0e0c0;}
+.ex-card.checked::before{background:var(--green);}
+.ex-card.stretch-card{border-color:#dae8f8;background:#f5f9ff;}
+.ex-card.stretch-card::before{background:#b0ccf0;}
+.ex-num{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:0.03em;color:var(--muted);min-width:20px;text-align:right;flex-shrink:0;}
+.ex-card.checked .ex-num{color:var(--green);}
+.ex-info{flex:1;min-width:0;}
+.ex-name{font-weight:600;font-size:0.9rem;margin-bottom:2px;color:var(--ink);}
+.ex-card.checked .ex-name{text-decoration:line-through;color:var(--muted);}
+.ex-detail{font-size:0.72rem;color:var(--muted);}
+.ex-detail strong{color:var(--accent);font-weight:700;}
+.ex-detail .kb{color:var(--accent2);}
+.ex-detail.stretch-dur strong{color:var(--blue);}
+.ex-actions{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.info-btn{width:25px;height:25px;border-radius:50%;border:2px solid var(--border);background:transparent;color:var(--muted);font-size:0.72rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;flex-shrink:0;}
+.info-btn:hover,.info-btn.open{border-color:var(--accent);color:var(--accent);background:#fff5f2;}
+.info-btn.stretch-info:hover,.info-btn.stretch-info.open{border-color:var(--blue);color:var(--blue);background:#f0f5ff;}
+.check-icon{width:24px;height:24px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s;color:transparent;font-size:0.68rem;cursor:pointer;}
+.ex-card.checked .check-icon{background:var(--green);border-color:var(--green);color:#fff;}
+.timer-trigger{width:25px;height:25px;border-radius:50%;border:2px solid var(--border);background:transparent;color:var(--muted);font-size:0.72rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;flex-shrink:0;}
+.timer-trigger:hover{border-color:var(--accent);color:var(--accent);background:#fff5f2;}
+.timer-trigger.stretch-timer:hover{border-color:var(--blue);color:var(--blue);background:#f0f5ff;}
+
+.ex-explainer{background:#fafaf8;border:2px solid var(--border);border-top:none;border-radius:0 0 10px 10px;padding:0 14px;max-height:0;overflow:hidden;transition:max-height 0.35s ease,padding 0.3s ease;}
+.ex-explainer.stretch-exp{background:#f5f9ff;border-color:#dae8f8;}
+.ex-explainer.open{max-height:400px;padding:12px 14px;}
+.explainer-section{margin-bottom:10px;}
+.explainer-section:last-child{margin-bottom:0;}
+.explainer-label{font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:3px;}
+.explainer-label.why{color:var(--accent2);}
+.explainer-label.cues{color:var(--green);}
+.explainer-label.feel{color:var(--blue);}
+.explainer-text{font-size:0.78rem;color:#666;line-height:1.55;}
+.cue-steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px;}
+.cue-step{display:flex;gap:8px;align-items:flex-start;font-size:0.78rem;color:#666;line-height:1.5;}
+.cue-step-num{font-family:'Bebas Neue',sans-serif;font-size:0.85rem;letter-spacing:0.05em;color:var(--green);min-width:16px;flex-shrink:0;margin-top:1px;}
+
+.progress-bar-wrap{margin:16px 0 0;display:flex;align-items:center;gap:10px;}
+.progress-bar{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+.progress-fill{height:100%;background:var(--accent);border-radius:3px;transition:width 0.4s ease;}
+.progress-pct{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:0.04em;color:var(--accent);min-width:36px;text-align:right;}
+.complete-msg{margin:12px 0 0;background:#f0fff5;border:2px solid #80d0a0;border-radius:8px;padding:12px 14px;font-size:0.82rem;color:var(--green);font-weight:600;text-align:center;display:none;}
+.complete-msg.show{display:block;}
+
+.rest-tip{margin:16px 0 0;padding:12px 14px;border:1.5px dashed var(--border);border-radius:8px;font-size:0.75rem;color:var(--muted);line-height:1.6;}
+.rest-tip strong{color:var(--ink);font-weight:600;}
+.stretch-tip{margin:16px 0 0;padding:12px 14px;border:1.5px dashed #b0ccf0;border-radius:8px;font-size:0.75rem;color:#4a6a9a;line-height:1.6;}
+.stretch-tip strong{color:var(--blue);font-weight:600;}
+
+.rest-day-card{margin:20px 0 0;padding:32px 16px;background:var(--surface);border:2px solid var(--border);border-radius:12px;text-align:center;}
+.rest-day-icon{font-size:2.4rem;margin-bottom:10px;}
+.rest-day-title{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:0.06em;color:var(--muted);margin-bottom:8px;}
+.rest-day-note{font-size:0.78rem;color:var(--muted);line-height:1.6;}
+
+/* TIMER */
+.timer-bar{position:fixed;bottom:0;left:0;right:0;background:var(--ink);padding:12px 16px 24px;display:flex;align-items:center;gap:12px;z-index:100;transform:translateY(100%);transition:transform 0.3s ease;}
+.timer-bar.visible{transform:translateY(0);}
+.timer-label{font-size:0.68rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:rgba(255,255,255,0.5);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.timer-display{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:0.06em;min-width:72px;text-align:center;color:var(--accent);transition:color 0.3s;}
+.timer-display.warning{color:var(--accent2);}
+.timer-display.done{color:#4caf7d;}
+.timer-track{position:absolute;top:0;left:0;right:0;height:3px;background:rgba(255,255,255,0.1);}
+.timer-fill{height:100%;background:var(--accent);transition:width 0.5s linear;width:0%;}
+.timer-btns{display:flex;gap:6px;}
+.timer-btn{width:38px;height:38px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.08);color:#fff;font-size:0.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;flex-shrink:0;}
+.timer-btn:hover{border-color:var(--accent);color:var(--accent);}
+.timer-btn.close-btn{color:rgba(255,255,255,0.4);font-size:0.75rem;}
+.timer-btn.close-btn:hover{border-color:#ff6060;color:#ff6060;}
+
+.prog-tag{display:inline-block;font-size:0.58rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:2px 6px;border-radius:4px;margin-left:6px;vertical-align:middle;}
+.prog-tag.up{background:#fff3e6;color:var(--accent2);border:1px solid #ffcca0;}
+.prog-tag.new{background:#f0fff5;color:var(--green);border:1px solid #80d0a0;}
+.prog-tag.test{background:#f5f0ff;color:var(--purple);border:1px solid #c0a0ff;}
+
+/* ROUND COUNTER */
+.round-counter{display:flex;align-items:center;gap:3px;flex-shrink:0;}
+.round-pip{width:9px;height:9px;border-radius:50%;border:2px solid var(--border);background:transparent;transition:all 0.2s;}
+.round-pip.filled{background:var(--green);border-color:var(--green);}
+.round-btn{min-width:38px;height:28px;border-radius:14px;border:2px solid var(--border);background:transparent;color:var(--muted);font-weight:700;font-size:0.72rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;transition:all 0.2s;padding:0 8px;}
+.round-btn:hover{border-color:var(--green);color:var(--green);}
+.round-btn.done{background:#f0fff5;border-color:var(--green);color:var(--green);}
+
+/* SWAP */
+.swap-btn{width:25px;height:25px;border-radius:50%;border:2px solid var(--border);background:transparent;color:var(--muted);font-size:0.78rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;flex-shrink:0;}
+.swap-btn:hover{border-color:var(--accent);color:var(--accent);background:#fff5f2;}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;display:flex;align-items:flex-end;}
+.modal-sheet{background:var(--surface);border-radius:16px 16px 0 0;width:100%;max-height:80vh;display:flex;flex-direction:column;border-top:3px solid var(--accent);}
+.modal-header{padding:18px 16px 12px;display:flex;align-items:flex-start;justify-content:space-between;border-bottom:1.5px solid var(--border);flex-shrink:0;}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:0.06em;color:var(--ink);}
+.modal-sub{font-size:0.72rem;color:var(--muted);margin-top:2px;font-weight:500;}
+.modal-close{width:30px;height:30px;border-radius:50%;border:2px solid var(--border);background:none;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.8rem;flex-shrink:0;}
+.modal-close:hover{border-color:var(--accent);color:var(--accent);}
+.modal-filter{padding:10px 16px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;flex-shrink:0;border-bottom:1.5px solid var(--border);}
+.modal-filter::-webkit-scrollbar{display:none;}
+.filter-chip{padding:5px 12px;border-radius:20px;border:2px solid var(--border);background:var(--surface2);color:var(--muted);font-weight:600;font-size:0.68rem;letter-spacing:0.04em;text-transform:uppercase;cursor:pointer;white-space:nowrap;transition:all 0.15s;}
+.filter-chip.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.modal-list{overflow-y:auto;padding:10px 16px 30px;flex:1;}
+.swap-option{padding:13px 14px;border:2px solid var(--border);border-radius:8px;margin-bottom:8px;cursor:pointer;background:var(--surface);transition:all 0.15s;}
+.swap-option:hover{border-color:var(--accent);background:#fff5f2;}
+.swap-option-name{font-weight:600;font-size:0.9rem;margin-bottom:2px;color:var(--ink);}
+.swap-option-detail{font-size:0.72rem;color:var(--muted);}
+.swap-option.current{opacity:0.4;cursor:default;}
+.swap-option.current:hover{border-color:var(--border);background:var(--surface);}
+.swap-option.selected-swap{border-color:var(--accent);background:#fff5f2;}
+.swap-scope{display:none;gap:8px;margin-top:10px;}
+.scope-btn{flex:1;padding:9px 6px;border-radius:6px;border:2px solid var(--border);background:var(--surface2);color:var(--ink);font-weight:600;font-size:0.72rem;cursor:pointer;transition:all 0.15s;}
+.scope-btn:hover{border-color:var(--muted);}
+.scope-btn.scope-all{border-color:var(--accent);color:var(--accent);background:#fff5f2;}
+.scope-btn.scope-all:hover{background:#ffe8e0;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Home <span>Workout</span></div>
+  <div style="display:flex;gap:8px;">
+    <button class="hdr-btn" id="edit-btn" style="display:none" onclick="editProgram()">Edit</button>
+    <button class="hdr-btn" id="reset-btn" style="display:none" onclick="resetProgram()">New</button>
+  </div>
+</header>
+
+<!-- WIZARD -->
+<div id="wizard">
+  <div class="wizard-progress"><div class="wizard-progress-fill" id="wiz-progress" style="width:0%"></div></div>
+  <div class="wizard-body">
+
+    <!-- STEP 1: Weeks -->
+    <div class="wizard-step active" id="step-1">
+      <div class="step-label">Step 1 of 8</div>
+      <div class="step-title">How many <span>weeks?</span></div>
+      <div class="step-sub">Longer programs build more strength. 8–12 weeks is the sweet spot for most people.</div>
+      <div class="slider-label">Program length</div>
+      <div class="slider-wrap">
+        <div class="slider-row">
+          <input type="range" class="slider" id="weeks-slider" min="4" max="16" value="10" oninput="updateSlider('weeks',this.value)">
+          <div class="slider-val" id="weeks-val">10 weeks</div>
+        </div>
+      </div>
+      <div class="wizard-nav">
+        <button class="btn-next" onclick="nextStep()">Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: Days -->
+    <div class="wizard-step" id="step-2">
+      <div class="step-label">Step 2 of 8</div>
+      <div class="step-title">Which <span>days?</span></div>
+      <div class="step-sub">Pick your training days. Rest days are assigned automatically.</div>
+      <div class="day-grid" id="day-picker"></div>
+      <div class="day-count" id="day-count">0 days selected</div>
+      <div class="wizard-nav">
+        <button class="btn-back" onclick="prevStep()">←</button>
+        <button class="btn-next" id="btn-next-2" disabled onclick="nextStep()">Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Session length -->
+    <div class="wizard-step" id="step-3">
+      <div class="step-label">Step 3 of 8</div>
+      <div class="step-title">Session <span>length?</span></div>
+      <div class="step-sub">This determines how many exercises and rounds per session.</div>
+      <div class="option-grid">
+        <div class="opt-card" data-val="10" onclick="selectOpt(this,'session')">
+          <div class="opt-title">10 minutes</div>
+          <div class="opt-sub">3–4 exercises · 2 rounds · quick daily habit</div>
+        </div>
+        <div class="opt-card" data-val="15" onclick="selectOpt(this,'session')">
+          <div class="opt-title">15 minutes</div>
+          <div class="opt-sub">4–5 exercises · 3 rounds · solid daily session</div>
+        </div>
+        <div class="opt-card" data-val="20" onclick="selectOpt(this,'session')">
+          <div class="opt-title">20 minutes</div>
+          <div class="opt-sub">5–6 exercises · 3–4 rounds · full session</div>
+        </div>
+        <div class="opt-card" data-val="30" onclick="selectOpt(this,'session')">
+          <div class="opt-title">30 minutes</div>
+          <div class="opt-sub">6+ exercises · 4–5 rounds · comprehensive workout</div>
+        </div>
+      </div>
+      <div class="wizard-nav">
+        <button class="btn-back" onclick="prevStep()">←</button>
+        <button class="btn-next" id="btn-next-3" disabled onclick="nextStep()">Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: Equipment -->
+    <div class="wizard-step" id="step-4">
+      <div class="step-label">Step 4 of 8</div>
+      <div class="step-title">Equipment <span>available?</span></div>
+      <div class="step-sub">Select all that apply.</div>
+      <div class="equip-grid">
+        <div class="opt-card selected" data-val="bw" onclick="toggleEquip(this)">
+          <div class="opt-title">Bodyweight</div>
+          <div class="opt-sub">Push-ups, planks, squats, dips — always available</div>
+        </div>
+        <div class="opt-card" data-val="kb_light" onclick="toggleEquip(this)">
+          <div class="opt-title">Light Kettlebell (8–12 kg)</div>
+          <div class="opt-sub">Halos, windmills, goblet squats, carries</div>
+        </div>
+        <div class="opt-card" data-val="kb_heavy" onclick="toggleEquip(this)">
+          <div class="opt-title">Heavy Kettlebell (14–24 kg)</div>
+          <div class="opt-sub">Deadlifts, cleans, presses, swings</div>
+        </div>
+        <div class="opt-card" data-val="bar" onclick="toggleEquip(this)">
+          <div class="opt-title">Pull-up Bar / Rings</div>
+          <div class="opt-sub">Pull-ups, inverted rows, hanging core work</div>
+        </div>
+        <div class="opt-card" data-val="bench" onclick="toggleEquip(this)">
+          <div class="opt-title">Bench / Box / Chair</div>
+          <div class="opt-sub">Dips, elevated push-ups, Bulgarian split squats</div>
+        </div>
+      </div>
+      <div class="wizard-nav">
+        <button class="btn-back" onclick="prevStep()">←</button>
+        <button class="btn-next" onclick="nextStep()">Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 5: Focus per day -->
+    <div class="wizard-step" id="step-5">
+      <div class="step-label">Step 5 of 8</div>
+      <div class="step-title">Day <span>focus?</span></div>
+      <div class="step-sub">Assign a training focus to each day. Balance push/pull/legs across the week.</div>
+      <div id="focus-rows"></div>
+      <div class="wizard-nav">
+        <button class="btn-back" onclick="prevStep()">←</button>
+        <button class="btn-next" onclick="nextStep()">Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 6: Level -->
+    <div class="wizard-step" id="step-6">
+      <div class="step-label">Step 6 of 8</div>
+      <div class="step-title">Your <span>level?</span></div>
+      <div class="step-sub">This sets starting difficulty and progression speed.</div>
+      <div class="option-grid">
+        <div class="opt-card" data-val="beginner" onclick="selectOpt(this,'level')">
+          <div class="opt-title">Beginner</div>
+          <div class="opt-sub">Getting started or back into training. Lower reps, simpler movements.</div>
+        </div>
+        <div class="opt-card" data-val="intermediate" onclick="selectOpt(this,'level')">
+          <div class="opt-title">Intermediate</div>
+          <div class="opt-sub">Training occasionally. Solid base, ready for progression.</div>
+        </div>
+        <div class="opt-card" data-val="advanced" onclick="selectOpt(this,'level')">
+          <div class="opt-title">Advanced</div>
+          <div class="opt-sub">Training regularly (e.g. CrossFit 2–3x/week). High baseline.</div>
+        </div>
+      </div>
+      <div class="wizard-nav">
+        <button class="btn-back" onclick="prevStep()">←</button>
+        <button class="btn-next" id="btn-next-6" disabled onclick="nextStep()">Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 7: Cooldown -->
+    <div class="wizard-step" id="step-7">
+      <div class="step-label">Step 7 of 8</div>
+      <div class="step-title">Include <span>cooldown?</span></div>
+      <div class="step-sub">A post-workout stretch routine matched to each day's focus. Adds ~5 minutes per session.</div>
+      <div class="option-grid">
+        <div class="opt-card" data-val="yes" onclick="selectOpt(this,'cooldown')">
+          <div class="opt-title">Yes — include cooldown stretches</div>
+          <div class="opt-sub">3–4 stretches per session, matched to the muscles you just worked. Recommended.</div>
+        </div>
+        <div class="opt-card" data-val="no" onclick="selectOpt(this,'cooldown')">
+          <div class="opt-title">No — workout only</div>
+          <div class="opt-sub">Keep it lean. You can always stretch on your own after.</div>
+        </div>
+      </div>
+      <div class="wizard-nav">
+        <button class="btn-back" onclick="prevStep()">←</button>
+        <button class="btn-next" id="btn-next-7" disabled onclick="nextStep()">Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 8: Progression -->
+    <div class="wizard-step" id="step-8">
+      <div class="step-label">Step 8 of 8</div>
+      <div class="step-title">Auto <span>progression?</span></div>
+      <div class="step-sub">Progression means the program gets harder each week — more rounds, higher reps, longer holds, and harder exercise variants.</div>
+      <div class="option-grid">
+        <div class="opt-card" data-val="auto" onclick="selectOpt(this,'progression')">
+          <div class="opt-title">Auto-progression</div>
+          <div class="opt-sub">Reps, holds, and rounds increase week by week. Exercise variants step up at 60% of the program. Recommended.</div>
+        </div>
+        <div class="opt-card" data-val="fixed" onclick="selectOpt(this,'progression')">
+          <div class="opt-title">Fixed difficulty</div>
+          <div class="opt-sub">Same exercises, reps, and rounds every week. Good if you want consistency or are in a busy period.</div>
+        </div>
+      </div>
+      <div class="wizard-nav">
+        <button class="btn-back" onclick="prevStep()">←</button>
+        <button class="btn-next build" id="btn-build" disabled onclick="buildProgram()">Build My Program ✓</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TRACKER -->
+<div id="tracker">
+  <div class="week-selector">
+    <div class="week-selector-label" id="week-selector-label">Program</div>
+    <div class="week-grid" id="week-grid"></div>
+  </div>
+  <div id="prog-banner" class="prog-banner p1"></div>
+  <div class="tabs" id="day-tabs"></div>
+  <div class="content" id="content"></div>
+</div>
+
+<!-- SWAP MODAL -->
+<div class="modal-overlay" id="swap-modal" style="display:none" onclick="closeSwap(event)">
+  <div class="modal-sheet">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Swap Exercise</div>
+        <div class="modal-sub" id="swap-replacing">Replacing: —</div>
+      </div>
+      <button class="modal-close" onclick="closeSwapBtn()">✕</button>
+    </div>
+    <div class="modal-filter" id="swap-filters"></div>
+    <div class="modal-list" id="swap-list"></div>
+  </div>
+</div>
+
+<!-- TIMER -->
+<div class="timer-bar" id="timer-bar">
+  <div class="timer-track"><div class="timer-fill" id="timer-fill"></div></div>
+  <div class="timer-label" id="timer-label">Timer</div>
+  <div class="timer-display" id="timer-display">0:00</div>
+  <div class="timer-btns">
+    <button class="timer-btn" id="timer-playpause" onclick="timerPlayPause()">▶</button>
+    <button class="timer-btn" onclick="timerReset()">↺</button>
+    <button class="timer-btn close-btn" onclick="timerClose()">✕</button>
+  </div>
+</div>
+
+<script>
+// ─── EXERCISE LIBRARY ────────────────────────────────────────────────────────
+// Each exercise: {id, name, pattern, equipment, what, why, cues, timed, variants}
+// pattern: push|pull|hinge|squat|core|carry|mobility|power
+// equipment: bw|kb_light|kb_heavy|bar|bench
+// variants: [{level:'beginner'|'intermediate'|'advanced', reps/secs, tag}]
+
+const LIBRARY = [
+  // ── PUSH ──
+  {id:'pushup',name:'Push-ups',pattern:'push',equip:['bw'],
+   what:'Classic horizontal push. Trains chest, shoulders, and triceps.',
+   why:'Foundational upper body strength with zero equipment.',
+   cues:'Start in a high plank — hands just wider than shoulders, body in a straight line.|Lower your chest toward the floor over 3 seconds, elbows at roughly 45° from your body.|Stop just before your chest touches — don\'t rest on the floor.|Press back up to full arm extension in 1 second.|Squeeze your glutes and brace your core throughout.',
+   variants:[
+     {level:'beginner',  label:'8–10 reps', timed:false},
+     {level:'intermediate', label:'12–15 reps', timed:false},
+     {level:'advanced',  label:'15–20 reps', timed:false},
+   ]},
+  {id:'pike_pushup',name:'Pike Push-ups',pattern:'push',equip:['bw'],
+   what:'Hips high, shoulder-dominant push-up variation.',
+   why:'Builds overhead pressing strength — stepping stone to handstand push-ups.',
+   cues:'Start in a push-up position, walk your feet in and push your hips high — body forms an upside-down V.|Bend your elbows to lower the top of your head toward the floor between your hands.|The higher your hips, the more load shifts to your shoulders.|Press back up to full arm extension. Keep the V shape throughout.',
+   variants:[
+     {level:'beginner',  label:'6–8 reps', timed:false},
+     {level:'intermediate', label:'8–12 reps', timed:false},
+     {level:'advanced',  label:'10–15 reps', timed:false},
+   ]},
+  {id:'elevated_pushup',name:'Feet-Elevated Push-ups',pattern:'push',equip:['bw','bench'],
+   what:'Feet on a bench/chair, hands on floor. Targets upper chest and shoulders.',
+   why:'Progressive overload for push-ups without adding weight.',
+   cues:'Place your feet on a chair or box, hands on the floor shoulder-width apart.|Body forms a straight diagonal line — brace your core and glutes.|Lower your chest toward the floor with control, 3 seconds down.|Press back up to full extension. Don\'t let your hips sag or pike.',
+   variants:[
+     {level:'intermediate', label:'8–12 reps', timed:false},
+     {level:'advanced',  label:'12–15 reps', timed:false},
+   ]},
+  {id:'archer_pushup',name:'Archer Push-ups',pattern:'push',equip:['bw'],
+   what:'Wide-arm push-up loading one arm at a time. Single-arm progression.',
+   why:'Builds unilateral pressing strength. Harder than regular push-ups.',
+   cues:'Start wide — hands much further apart than a standard push-up.|Shift your weight to one side as you lower, bending that elbow while the opposite arm stays nearly straight.|Lower until your chest is near the bent-arm hand.|Press back up and alternate sides each rep.',
+   variants:[
+     {level:'advanced',  label:'6–10 reps each side', timed:false},
+   ]},
+  {id:'dips',name:'Tricep Dips',pattern:'push',equip:['bw','bench'],
+   what:'Lower and press bodyweight through your triceps using a chair or bench.',
+   why:'Directly trains triceps — improves lockout in all pressing movements.',
+   cues:'Place hands on a chair edge behind you, fingers pointing forward.|Slide your hips off the edge so your arms support your weight.|Lower by bending your elbows — they should point straight back, not flare out.|Stop when upper arms are roughly parallel to the floor.|Press back up to full arm extension.',
+   variants:[
+     {level:'beginner',  label:'8–10 reps', timed:false},
+     {level:'intermediate', label:'12–15 reps', timed:false},
+     {level:'advanced',  label:'15–20 reps', timed:false},
+   ]},
+  {id:'kb_press',name:'KB Press',pattern:'push',equip:['kb_light','kb_heavy'],
+   what:'Strict single-arm overhead press from the rack position.',
+   why:'Builds shoulder and upper back strength. Exposes side-to-side differences.',
+   cues:'Clean the KB to the rack position: fist at shoulder, elbow tucked, KB resting on forearm.|Take a big breath and brace your core before pressing.|Press the KB straight overhead until fully locked out, bicep near your ear.|Lower slowly back to the rack. If you\'re leaning back, it\'s too heavy.',
+   variants:[
+     {level:'beginner',  label:'6–8 reps each side', timed:false},
+     {level:'intermediate', label:'8–10 reps each side', timed:false},
+     {level:'advanced',  label:'10–12 reps each side', timed:false},
+   ]},
+
+  // ── PULL ──
+  {id:'inverted_row',name:'Inverted Row',pattern:'pull',equip:['bw','bench'],
+   what:'Hang under a table or low bar and pull your chest up to it.',
+   why:'Corrects push/pull imbalance. Builds mid-back and biceps.',
+   cues:'Set up under a table or low bar. Grip overhand, hands shoulder-width apart.|Keep your body in a straight line from head to heels — brace like a plank.|Pull your chest up to the bar, leading with your elbows.|Lower slowly over 3 seconds. Don\'t let your hips drop.|Harder: elevate your feet on a chair.',
+   variants:[
+     {level:'beginner',  label:'6–8 reps', timed:false},
+     {level:'intermediate', label:'10–12 reps', timed:false},
+     {level:'advanced',  label:'12–15 reps (feet elevated)', timed:false},
+   ]},
+  {id:'pullup',name:'Pull-ups',pattern:'pull',equip:['bar'],
+   what:'Hang from a bar and pull your chin above it.',
+   why:'The gold standard upper body pull. Builds lats, biceps, and grip.',
+   cues:'Hang with straight arms, hands slightly wider than shoulders, palms facing away.|Before pulling, retract your shoulder blades — squeeze them together and down.|Pull your elbows toward your hips until your chin is above the bar.|Lower with control over 2–3 seconds back to a dead hang.',
+   variants:[
+     {level:'beginner',  label:'3–5 reps (assisted if needed)', timed:false},
+     {level:'intermediate', label:'5–8 reps', timed:false},
+     {level:'advanced',  label:'8–12 reps', timed:false},
+   ]},
+  {id:'superman',name:'Superman Hold',pattern:'pull',equip:['bw'],
+   what:'Lie face-down and lift arms, chest, and legs simultaneously.',
+   why:'Trains spinal erectors, glutes, and upper back — often underworked.',
+   cues:'Lie face-down, arms extended overhead.|Simultaneously squeeze your glutes and upper back to lift your arms, chest, and legs off the floor.|Think "long" — reach arms forward and legs back, don\'t just arch up.|Hold for the prescribed time, then lower with control.',
+   variants:[
+     {level:'beginner',  label:'8 reps × 2 sec hold', timed:false},
+     {level:'intermediate', label:'10 reps × 3 sec hold', timed:false},
+     {level:'advanced',  label:'12 reps × 3 sec hold', timed:false},
+   ]},
+  {id:'lat_pulldown_band',name:'Band Pull-Apart',pattern:'pull',equip:['bw'],
+   what:'Hold arms out in front and pull them apart to your sides, squeezing the shoulder blades.',
+   why:'Directly targets the rear deltoid and rhomboids — often neglected.',
+   cues:'Hold arms straight out in front at shoulder height.|Pull your arms apart and back, squeezing shoulder blades together.|At end range, hold 1 second and feel the squeeze between your shoulder blades.|Return slowly. Keep arms straight throughout.',
+   variants:[
+     {level:'beginner',  label:'12 reps', timed:false},
+     {level:'intermediate', label:'15 reps', timed:false},
+     {level:'advanced',  label:'20 reps', timed:false},
+   ]},
+
+  // ── HINGE ──
+  {id:'kb_rdl',name:'KB Romanian Deadlift',pattern:'hinge',equip:['kb_light','kb_heavy'],
+   what:'Single-leg hinge movement holding one KB, free leg extending behind.',
+   why:'Builds single-leg hamstring and glute strength. Fixes left-right imbalances.',
+   cues:'Hold the KB in the opposite hand to your working leg.|Push your hips back and hinge forward — torso and free leg form a straight line.|Lower the KB toward the floor, keeping it close to your shin.|Stop when you feel a strong hamstring stretch, before your back rounds.|Drive through your heel to return. Keep a micro-bend in the standing knee.',
+   variants:[
+     {level:'beginner',  label:'8 reps each side', timed:false},
+     {level:'intermediate', label:'10 reps each side', timed:false},
+     {level:'advanced',  label:'12 reps each side', timed:false},
+   ]},
+  {id:'kb_deadlift',name:'KB Deadlift',pattern:'hinge',equip:['kb_light','kb_heavy'],
+   what:'Hinge at the hips, grip the KB, stand up with full tension rebuilt each rep.',
+   why:'Foundation of all hinge movements. Makes cleans and barbell work safer.',
+   cues:'Stand with the KB between your feet. Hinge at the hip to grip it.|Before lifting: big breath in, brace your core, pull the slack out.|Drive through the floor with your legs — push the floor away.|Stand tall at the top, hips fully extended. Don\'t hyperextend your lower back.|Lower with control and completely reset before the next rep.',
+   variants:[
+     {level:'beginner',  label:'8 reps', timed:false},
+     {level:'intermediate', label:'10 reps', timed:false},
+     {level:'advanced',  label:'12 reps', timed:false},
+   ]},
+  {id:'kb_swing',name:'KB Swing',pattern:'hinge',equip:['kb_light','kb_heavy'],
+   what:'Ballistic hip hinge — explosive power from glutes and hamstrings.',
+   why:'Ties together hip hinge, glutes, core, and shoulder stability in one movement.',
+   cues:'Stand with KB about a foot in front of you. Hinge to grip it.|Hike the KB back between your legs to load the hips.|Drive your hips forward explosively. The KB floats up from hip power, not your arms.|At the top, body forms a straight line — squeeze glutes, brace core.|Let the KB swing back and immediately load the hips for the next rep.',
+   variants:[
+     {level:'beginner',  label:'12 reps', timed:false},
+     {level:'intermediate', label:'15 reps', timed:false},
+     {level:'advanced',  label:'20 reps', timed:false},
+   ]},
+  {id:'glute_bridge',name:'Glute Bridge',pattern:'hinge',equip:['bw'],
+   what:'Drive hips up from your back until shoulders-to-knees form a straight line.',
+   why:'Activates and strengthens the glutes — the most powerful muscle group.',
+   cues:'Lie on your back, knees bent, feet flat on the floor hip-width apart.|Press through your heels to drive hips up toward the ceiling.|Squeeze your glutes hard for 1–2 seconds at the top.|Keep your ribs down — don\'t flare them to fake extra height.|Lower with control and repeat.',
+   variants:[
+     {level:'beginner',  label:'12 reps', timed:false},
+     {level:'intermediate', label:'15 reps', timed:false},
+     {level:'advanced',  label:'12 reps each side (single leg)', timed:false},
+   ]},
+
+  // ── SQUAT ──
+  {id:'goblet_squat',name:'KB Goblet Squat',pattern:'squat',equip:['kb_light','kb_heavy'],
+   what:'Squat holding the KB at chest height. Forces upright torso.',
+   why:'Trains quads, glutes, and core. The goblet position corrects forward lean.',
+   cues:'Hold the KB by the horns at chest height, elbows pointing down.|Stand with feet shoulder-width apart, toes turned out slightly.|Sit straight down between your heels — not forward, down.|Keep your chest upright and elbows tracking inside your knees.|Pause 1 second at the bottom, then drive through your heels to stand.',
+   variants:[
+     {level:'beginner',  label:'8–10 reps', timed:false},
+     {level:'intermediate', label:'12 reps, 1 sec pause', timed:false},
+     {level:'advanced',  label:'12 reps, 3 sec descent', timed:false},
+   ]},
+  {id:'squat_bw',name:'Bodyweight Squat',pattern:'squat',equip:['bw'],
+   what:'Standard bodyweight squat — hips below parallel.',
+   why:'Fundamental lower body movement. Develops quad and glute strength.',
+   cues:'Stand with feet shoulder-width apart, toes slightly turned out.|Sit your hips back and down, keeping your chest up.|Lower until your hips are at or below knee height — full depth.|Keep your weight in your heels and midfoot.|Drive through the floor to stand, squeezing glutes at the top.',
+   variants:[
+     {level:'beginner',  label:'12–15 reps', timed:false},
+     {level:'intermediate', label:'15–20 reps', timed:false},
+     {level:'advanced',  label:'20 reps (or add jump)', timed:false},
+   ]},
+  {id:'split_squat',name:'KB Split Squat',pattern:'squat',equip:['bw','kb_light'],
+   what:'Single-leg squat with rear foot flat or elevated.',
+   why:'Builds unilateral strength. Fixes imbalances that bilateral squats hide.',
+   cues:'Stand with one foot forward and one back, hip-width apart. Rear foot flat or elevated on a chair.|Lower straight down — your front shin should stay roughly vertical.|Stop just before your rear knee touches the floor.|Drive through your front heel to stand. Don\'t let the front knee cave inward.|Complete all reps on one leg before switching.',
+   variants:[
+     {level:'beginner',  label:'8 reps each leg (foot flat)', timed:false},
+     {level:'intermediate', label:'10 reps each leg', timed:false},
+     {level:'advanced',  label:'10 reps each leg (rear foot elevated)', timed:false},
+   ]},
+
+  // ── CORE ──
+  {id:'plank',name:'Plank',pattern:'core',equip:['bw'],
+   what:'Isometric anti-extension core exercise — resisting gravity bending your spine.',
+   why:'Real core strength is resisting movement. Transfers to every lift.',
+   cues:'Place forearms on the floor, elbows directly under your shoulders.|Lift your hips so your body forms a straight line from head to heels.|Squeeze your glutes and brace your abs as if bracing for a punch.|Push the floor away with your elbows to engage your shoulders.|If your form breaks before the timer, stop and reset. Quality over duration.',
+   timed:true,
+   variants:[
+     {level:'beginner',  label:'20 sec', timed:true, secs:20},
+     {level:'intermediate', label:'35 sec', timed:true, secs:35},
+     {level:'advanced',  label:'45 sec', timed:true, secs:45},
+   ]},
+  {id:'side_plank',name:'Side Plank',pattern:'core',equip:['bw'],
+   what:'Support on one forearm and foot, body in a straight lateral line.',
+   why:'Builds lateral core — obliques and QL — protecting the spine from side-bending.',
+   cues:'Lie on your side, forearm on the floor, elbow under your shoulder.|Stack your feet or stagger them for balance.|Drive your hips up so your body forms a straight lateral line — no sagging.|Keep your top hip stacked over your bottom hip. Don\'t rotate forward.|Phase variation — hip dips: lower your hip to the floor and raise it back up with control.',
+   timed:true,
+   variants:[
+     {level:'beginner',  label:'20 sec each side', timed:true, secs:20},
+     {level:'intermediate', label:'30 sec each side', timed:true, secs:30},
+     {level:'advanced',  label:'40 sec each side', timed:true, secs:40},
+   ]},
+  {id:'hollow_body',name:'Hollow Body Hold',pattern:'core',equip:['bw'],
+   what:'Compressed position on your back — lower back pressed to floor, arms overhead.',
+   why:'Foundation of gymnastics and CF: kipping, toes-to-bar, muscle-ups.',
+   cues:'Lie on your back and press your lower back hard into the floor — this is non-negotiable.|Extend your arms overhead.|Lift your legs and shoulders off the floor simultaneously.|Start with legs higher (easier). Work toward lower legs over time.|If your lower back lifts off the floor, raise your legs — that\'s your limit today.',
+   timed:true,
+   variants:[
+     {level:'beginner',  label:'15 sec', timed:true, secs:15},
+     {level:'intermediate', label:'22 sec', timed:true, secs:22},
+     {level:'advanced',  label:'30 sec', timed:true, secs:30},
+   ]},
+  {id:'dead_bug',name:'Dead Bug',pattern:'core',equip:['bw'],
+   what:'Opposite arm and leg away from body while lower back stays flat on the floor.',
+   why:'Trains deep core stability and anti-extension. Foundation of all pressing movements.',
+   cues:'Lie on your back, arms pointing up, hips and knees at 90°.|Press your lower back firmly into the floor and hold it there throughout.|Slowly lower your right arm and left leg toward the floor simultaneously.|Stop just before they touch, return, and switch sides.|If your back arches at any point, reduce your range of motion.',
+   variants:[
+     {level:'beginner',  label:'6 reps each side', timed:false},
+     {level:'intermediate', label:'8 reps each side', timed:false},
+     {level:'advanced',  label:'10 reps each side', timed:false},
+   ]},
+  {id:'ab_wheel',name:'Ab Wheel Rollout',pattern:'core',equip:['bw'],
+   what:'Roll forward on an ab wheel (or use a KB) extending the body, then return.',
+   why:'One of the most effective anti-extension core exercises. Brutally honest.',
+   cues:'Kneel with the ab wheel in front of you.|Brace your core hard — ribcage pulled toward hips.|Roll slowly forward, keeping your hips in line with your body.|Stop just before your hips drop or your lower back arches.|Pull back using your lats and core — don\'t just fall back.',
+   variants:[
+     {level:'intermediate', label:'6–8 reps', timed:false},
+     {level:'advanced',  label:'8–12 reps', timed:false},
+   ]},
+
+  // ── CARRY ──
+  {id:'suitcase_carry',name:'KB Suitcase Carry',pattern:'carry',equip:['kb_light','kb_heavy'],
+   what:'Walk holding a KB in one hand — stay completely upright despite the load.',
+   why:'Anti-lateral-flexion core plus grip and shoulder stability. Most underrated core exercise.',
+   cues:'Hold the KB in one hand at your side, like a suitcase.|Stand tall — do not lean toward or away from the KB. Shoulders stay level.|Walk with a controlled, normal gait. Don\'t shuffle.|Brace your core throughout to resist the lateral pull.|If you start leaning significantly, the weight is too heavy.',
+   variants:[
+     {level:'beginner',  label:'15m each hand', timed:false},
+     {level:'intermediate', label:'20m each hand', timed:false},
+     {level:'advanced',  label:'25m each hand', timed:false},
+   ]},
+
+  // ── MOBILITY ──
+  {id:'wgs',name:'World\'s Greatest Stretch',pattern:'mobility',equip:['bw'],
+   what:'Multi-joint sequence: lunge, rotate, reach. Hits hip flexors, thoracic spine, hamstrings.',
+   why:'Best single mobility drill. Opens positions desk-sitting closes down.',
+   cues:'Step forward into a lunge with your right foot.|Place your right hand on the floor inside your right foot.|Rotate and reach your left arm up toward the ceiling. Hold 2 seconds.|Then reach the left arm under your body as far as possible.|Return to standing and switch sides.',
+   timed:false,
+   variants:[
+     {level:'beginner',  label:'4 reps each side', timed:false},
+     {level:'intermediate', label:'5 reps each side', timed:false},
+     {level:'advanced',  label:'6 reps each side', timed:false},
+   ]},
+  {id:'kb_windmill',name:'KB Windmill',pattern:'mobility',equip:['kb_light'],
+   what:'KB overhead, hinge sideways while arm stays straight — lowering toward opposite foot.',
+   why:'Shoulder health, hip mobility, and lateral core strength combined.',
+   cues:'Press the KB overhead in one hand and lock the arm out.|Turn your feet 45° away from the KB side.|Push your hip out to the KB side and hinge sideways, trailing hand sliding down your leg.|Keep your eyes on the KB at all times — this keeps the arm locked out.|Go as low as your mobility allows. Never bend the pressing arm.',
+   timed:false,
+   variants:[
+     {level:'intermediate', label:'5 reps each side', timed:false},
+     {level:'advanced',  label:'6 reps each side', timed:false},
+   ]},
+  {id:'deep_squat_hold',name:'Deep Squat Hold',pattern:'mobility',equip:['bw'],
+   what:'Hold the bottom of a squat for time. Feet flat, hips below parallel.',
+   why:'Restores hip, ankle, and thoracic mobility. Weekly tracking shows real progress.',
+   cues:'Stand with feet slightly wider than shoulder-width, toes turned out.|Lower into a full squat with hips below your knees. Use a KB as a counterweight in front if needed.|Try to keep your heels flat on the floor.|Relax into the position — don\'t fight it. Let your hips open with each exhale.|Over weeks you\'ll go deeper with less effort.',
+   timed:true,
+   variants:[
+     {level:'beginner',  label:'30 sec', timed:true, secs:30},
+     {level:'intermediate', label:'45 sec', timed:true, secs:45},
+     {level:'advanced',  label:'60 sec', timed:true, secs:60},
+   ]},
+  {id:'cat_cow',name:'Cat-Cow',pattern:'mobility',equip:['bw'],
+   what:'On hands and knees, alternate arching (cat) and dipping (cow) your spine with breath.',
+   why:'Restores spinal mobility and reduces stiffness. Activates parasympathetic system.',
+   cues:'Start on hands and knees — hands under shoulders, knees under hips.|Exhale and round your back up toward the ceiling, tuck your chin to chest (Cat).|Inhale and let your belly drop toward the floor, lift your head and tailbone (Cow).|Move slowly. The breath drives the movement.',
+   variants:[
+     {level:'beginner',  label:'10 reps', timed:false},
+     {level:'intermediate', label:'12 reps', timed:false},
+     {level:'advanced',  label:'12 reps', timed:false},
+   ]},
+
+  // ── POWER ──
+  {id:'kb_clean',name:'KB Clean',pattern:'power',equip:['kb_light','kb_heavy'],
+   what:'Swing KB from between legs to rack position in one fluid explosive motion.',
+   why:'Develops explosive hip power. Transfers directly to barbell cleans in CF.',
+   cues:'Start with the KB between your feet. Hinge to grip it.|Hike the KB back between your legs to load the hips.|Drive your hips forward explosively — same as a swing.|As the KB rises, pull your elbow back and guide it to the rack position: fist at shoulder, elbow tucked.|The KB should float into rack — think "guide", not "muscle up".',
+   variants:[
+     {level:'intermediate', label:'5 reps each side', timed:false},
+     {level:'advanced',  label:'6 reps each side', timed:false},
+   ]},
+  {id:'kb_complex',name:'KB Complex (DL + Clean + Press + Squat)',pattern:'power',equip:['kb_heavy'],
+   what:'Four KB movements done back-to-back without putting the bell down.',
+   why:'Builds strength-endurance across the whole body. Efficient full-body finisher.',
+   cues:'Perform each movement back-to-back without putting the KB down.|KB Deadlift: hinge, grip, drive through the floor to stand.|KB Clean: swing back, drive hips, guide to rack.|KB Press: brace, press overhead, lock out fully.|KB Front Squat: squat from rack position, elbows up, chest tall. Rest after all four. That is one round.',
+   variants:[
+     {level:'intermediate', label:'4 reps each movement', timed:false},
+     {level:'advanced',  label:'5 reps each movement', timed:false},
+   ]},
+  {id:'halo',name:'KB Halo',pattern:'mobility',equip:['kb_light'],
+   what:'Circle the KB around your head while keeping your torso completely still.',
+   why:'Warms up and strengthens rotator cuff and scapular stabilisers in all planes.',
+   cues:'Hold the KB by the horns upside-down at chest height.|Circle the KB slowly around your head — one side, back, other side, forward.|Keep your torso completely still. Only your arms move.|Brace your core, keep elbows in. Go slow — this is a control exercise.|Complete all reps in one direction, then reverse.',
+   variants:[
+     {level:'beginner',  label:'6 reps each way', timed:false},
+     {level:'intermediate', label:'8 reps each way', timed:false},
+     {level:'advanced',  label:'10 reps each way', timed:false},
+   ]},
+];
+
+// ─── STRETCHES LIBRARY ───────────────────────────────────────────────────────
+const STRETCHES = {
+  push:[
+    {name:'Doorway Chest Stretch',dur:'40 sec each side',eachSide:true,
+     what:'Stand in a doorway and place your forearm vertically on the frame at 90°, elbow at shoulder height. Step one foot through and gently rotate your body away from the arm until you feel a stretch across the chest.',
+     why:'Push-ups and dips shorten the pectoral muscles and anterior shoulder. Left tight, this pulls the shoulders forward into a rounded posture. This stretch directly counteracts that by opening the chest and restoring the shoulder to a neutral position.',
+     feel:'A broad, gentle pull across the front of your chest extending into the front of your shoulder. It should feel like a release, not pain. If you feel sharp pinching in the shoulder joint, lower your elbow slightly.'},
+    {name:"Child's Pose",dur:'60 sec',eachSide:false,
+     what:'Kneel on the floor and sit your hips back toward your heels. Reach both arms forward along the floor as far as possible, letting your forehead rest on the ground. Breathe deeply into your back.',
+     why:'Pressing movements recruit the lats as stabilisers. This stretch decompresses the entire spine and puts the lats on a gentle full-length stretch — hard to achieve any other way.',
+     feel:'A broad stretch across the upper back and into the armpits. With each exhale, let your chest sink closer to the floor. The stretch widens and deepens as you breathe.'},
+    {name:'Thread the Needle',dur:'30 sec each side',eachSide:true,
+     what:'On hands and knees, lift your right arm and slide it under your body along the floor, rotating your upper spine until your right shoulder and ear rest on the ground. Hold, then switch sides.',
+     why:'Planks and pressing lock the thoracic spine into a fixed position. This stretch restores rotational mobility in the mid-back, preventing stiffness that leads to lower back compensation during future sessions.',
+     feel:'A rotational stretch through the mid-back. The shoulder on the floor feels gently compressed. Let gravity do the work — do not force the rotation.'},
+  ],
+  pull:[
+    {name:'Lat Stretch',dur:'45 sec each side',eachSide:true,
+     what:'Hold a doorframe or bar with one hand at shoulder height. Sit your hips back and away, letting the arm go straight. Gently rotate your body so you get a full stretch along the side of your back.',
+     why:'Rows and pull-ups maximally contract the lats. When tight, the lats internally rotate the shoulder and restrict overhead range. Stretching them post-session maintains the shoulder mobility you need for pressing and overhead work.',
+     feel:'A deep stretch running from your armpit down the side of your torso. Each exhale should let you sink a little further. If you feel it in your lower back rather than your lat, rotate your body slightly more.'},
+    {name:'Doorway Pec Minor Stretch',dur:'30 sec each side',eachSide:true,
+     what:'Place your arm at 90° against a doorframe — upper arm horizontal, forearm vertical. Slowly rotate your body away from the arm, opening the front of the shoulder. Keep your shoulder blade pulled back and down.',
+     why:'Pulling exercises work the rear shoulder heavily but often leave the front tight. This imbalance is a common cause of shoulder impingement over time. This stretch re-opens the front to restore balance.',
+     feel:'Front of the shoulder and upper chest. Keep your shoulder blade actively retracted. Never push into a pinching sensation in the shoulder joint.'},
+    {name:'Pigeon Pose / Figure-4',dur:'60 sec each side',eachSide:true,
+     what:'Lie on your back. Cross your right ankle over your left knee, flexing your right foot. Either hold here or lift your left foot off the floor and pull it toward you for a deeper stretch. Hold, then switch.',
+     why:'Pulling patterns require strong hip stability, recruiting the glutes and external hip rotators. After sustained work, these muscles tighten and can compress the sciatic nerve if left unaddressed. This is the most effective release.',
+     feel:'Deep in the outer hip of the crossed leg. It can feel intense — breathe slowly and stay relaxed. The stretch typically eases noticeably after 20 to 30 seconds as the muscle releases.'},
+  ],
+  hinge:[
+    {name:'Standing Hamstring Stretch',dur:'45 sec each side',eachSide:true,
+     what:'Place one heel on a low surface. Keep both legs relatively straight and hinge forward at the hip, keeping your back flat. Reach toward your foot without rounding your lower back.',
+     why:'RDLs and deadlifts load the hamstrings in a lengthened position — exactly the stimulus for tightness. Stretching them while warm accelerates recovery and maintains the flexibility that keeps your lower back safe in future sessions.',
+     feel:'A clear pull running down the back of the raised leg from below the glute to behind the knee. Hinge from the hip, not the lower back. If you feel it more in your back than your leg, raise the surface or bend the knee slightly.'},
+    {name:'Pigeon Pose / Figure-4',dur:'60 sec each side',eachSide:true,
+     what:'Lie on your back. Cross your right ankle over your left knee. Press the right knee gently away from you, or lift the left foot to increase intensity. Hold for the full duration before switching.',
+     why:'The glutes are primary movers in hinge patterns. After heavy loading, they shorten and can pull on the lower back and hip joint. Regular post-hinge glute stretching is one of the highest-impact recovery habits for lower body training.',
+     feel:'Deep in the outer hip and glute of the crossed leg. It should feel like a melting sensation as the muscle releases. If you feel it in your lower back, check that your spine is flat on the floor.'},
+    {name:'Thoracic Extension over Towel',dur:'60 sec',eachSide:false,
+     what:'Roll a firm towel into a cylinder. Sit in front of it, then lean back so it sits horizontally across your mid-back at shoulder-blade level. Let your head and arms fall back toward the floor. Work up and down the spine.',
+     why:'Hinge movements demand thoracic extension — the upper back must stay extended to keep the lower back safe. Over time this range is lost. This stretch directly restores it, segment by segment.',
+     feel:'A releasing sensation through the middle of your back, like each vertebra is gently separating. Never place the towel under your lower back or neck.'},
+  ],
+  squat:[
+    {name:'Low Lunge Hip Flexor Stretch',dur:'60 sec each side',eachSide:true,
+     what:'Step into a long lunge with your right foot forward. Lower your left knee to the floor. Keep your torso upright and press your hips forward until you feel a stretch at the front of the left hip. Reach your left arm overhead for a deeper psoas stretch.',
+     why:'Squatting eccentrically loads the hip flexors and leaves them tight. Chronic hip flexor tightness causes anterior pelvic tilt, compresses the lower back, and reduces squat depth. This is the most direct way to address it.',
+     feel:'A stretch at the front of the hip and potentially into the quad of the rear leg. Keep your core lightly braced to prevent excessive lower back arching. The overhead arm reach deepens the stretch significantly.'},
+    {name:'Seated Forward Fold',dur:'60 sec',eachSide:false,
+     what:'Sit on the floor with both legs extended straight. Hinge forward from your hips — not your lower back — and reach your hands toward your feet. Use a towel around your feet if needed. Keep your spine as long as possible.',
+     why:'A passive forward fold held consistently over weeks genuinely increases hamstring length — directly translating to deeper squats with less forward lean. Doing it warm post-session maximises the adaptation.',
+     feel:'The back of both legs from the calves through the hamstrings. If you feel it more in your lower back than your legs, bend your knees slightly. Relax your upper body completely and use gravity.'},
+    {name:'Butterfly Stretch',dur:'60 sec',eachSide:false,
+     what:'Sit on the floor with the soles of your feet together, knees falling out to the sides. Hold your feet and gently use your elbows to press your knees toward the floor. Hinge forward slightly from the hips for more intensity.',
+     why:'Bilateral squatting tightens the adductors which are active stabilisers during the movement. Tight adductors restrict the hip abduction and external rotation positions needed for a full-depth squat.',
+     feel:'Inner thighs and groin. Never bounce — hold and let the muscles release gradually. The stretch intensifies in the first 20 seconds then begins to ease as tissue relaxes.'},
+  ],
+  core:[
+    {name:'Supine Spinal Twist',dur:'60 sec each side',eachSide:true,
+     what:'Lie on your back. Hug your right knee to your chest, then guide it across your body to the left. Extend your right arm out to the side and look right. Keep both shoulders flat on the floor. Hold, then switch.',
+     why:'Core work — planks, hollow holds, carries — creates compressive load on the lumbar spine. The spinal twist decompresses and rotates the spine in the opposite direction, releasing the paraspinals and quadratus lumborum.',
+     feel:'A rotation through the mid and lower back. Keep both shoulders flat — if the top shoulder lifts, you lose the spinal rotation. Let the weight of the leg provide the twist rather than forcing it down.'},
+    {name:'Oblique Side Stretch',dur:'30 sec each side',eachSide:true,
+     what:'Stand or sit tall. Raise your right arm overhead and reach it up and over to the left, creating a long arc from your hip to your fingertips. Keep your hips square and torso facing forward. Hold, then switch.',
+     why:'Side planks and carries intensely contract the obliques and QL on one side. These muscles are rarely stretched directly. Leaving them contracted causes lateral spine stiffness and asymmetric posture over time.',
+     feel:'The full length of your side from hip to armpit. Breathe into the stretched side — you should feel the ribs expand laterally. If you feel compression on the opposite side, you are bending rather than lengthening.'},
+    {name:"Child's Pose",dur:'60 sec',eachSide:false,
+     what:'Kneel and sit your hips back to your heels. Reach both arms forward on the floor as far as possible. Let your forehead rest on the ground and breathe deeply into your back.',
+     why:'Hollow holds and planks keep the spine in sustained tension. Child\'s pose provides a full-length passive decompression that releases the entire posterior chain from lumbar spine through lats in one position.',
+     feel:'A broad stretch across the whole back, widening with each exhale. If your hips do not reach your heels, place a folded blanket between them.'},
+  ],
+  carry:[
+    {name:'Neck and Trap Release',dur:'30 sec each side',eachSide:true,
+     what:'Sit tall. Tilt your head so your right ear moves toward your right shoulder. Place your right hand gently on top of your head — the weight of the hand alone is sufficient. Do not pull. Hold, then switch.',
+     why:'Carries demand sustained isometric contraction of the upper trapezius to keep the shoulder stable. Left unaddressed this accumulates into chronic neck tightness — a common cause of tension headaches in people who train carries regularly.',
+     feel:'The side of the neck and top of the shoulder being stretched. It should feel like a gentle release. Use no active force — the hand is a weight, not a lever.'},
+    {name:'Oblique Side Stretch',dur:'30 sec each side',eachSide:true,
+     what:'Stand or sit tall. Raise one arm overhead and reach it up and over to the opposite side, creating a long lateral arc. Keep your hips square and torso facing forward. Hold for the full duration before switching.',
+     why:'The lateral core works continuously during carries to prevent the trunk from tilting toward the loaded side. Left contracted, it leads to lateral stiffness and asymmetric tension affecting gait and posture.',
+     feel:'The full length of your side from hip to armpit. Breathe laterally into the stretch. If you feel compression on the opposite side, you are bending rather than lengthening.'},
+    {name:'Standing Calf Stretch',dur:'30 sec each side',eachSide:true,
+     what:'Place the ball of your right foot against a wall and press your heel firmly into the floor, knee straight. Lean slightly into the wall. For the deeper calf (soleus), bend the knee slightly while maintaining heel contact.',
+     why:'Loaded carries place sustained demand on the calves with every step. Tight calves restrict ankle dorsiflexion, limiting squat depth and increasing injury risk throughout lower body training.',
+     feel:'The belly of the calf with a straight knee. Bent knee targets the deeper soleus. Keep the heel pressed firmly into the floor throughout.'},
+  ],
+  power:[
+    {name:'Wrist Flexor Stretch',dur:'30 sec each side',eachSide:true,
+     what:'Extend your right arm straight in front, palm facing up. With your left hand, gently pull the fingers back toward you until you feel a stretch along the inside of the forearm. Hold, then switch.',
+     why:'KB cleaning and pressing put the wrist flexors under significant repeated load — the rack position particularly stresses them. Without regular stretching this leads to forearm tightness that can progress to medial elbow pain.',
+     feel:'A stretch along the inside of the forearm from wrist toward elbow. Use gentle pressure only. If you feel tingling in the fingers, reduce the pull slightly.'},
+    {name:'Cross-Body Shoulder Stretch',dur:'30 sec each side',eachSide:true,
+     what:'Bring your right arm across your chest. Use your left hand or forearm to hold it in place. Keep your right shoulder actively pulled down — do not let it rise toward your ear. Hold, then switch.',
+     why:'KB pressing and cleaning load the posterior deltoid and teres minor as they decelerate the arm and stabilise the socket. These muscles become chronically tight if not addressed, restricting internal rotation and contributing to shoulder impingement.',
+     feel:'The back of the shoulder of the arm being stretched. Keep the shoulder actively depressed throughout. The stretch is position-sensitive and easy to lose with poor shoulder position.'},
+    {name:'Thoracic Extension over Towel',dur:'60 sec',eachSide:false,
+     what:'Roll a firm towel into a cylinder. Lean back so it sits horizontally across your mid-back at shoulder-blade level. Let your head and arms fall back. Hold 60 seconds then move the towel to target different segments.',
+     why:'KB complexes demand sustained thoracic extension for pressing and front squats. This stretch directly reverses the compression that training and desk work create in the thoracic spine.',
+     feel:'A releasing sensation through the mid-back. Work the towel to find the tightest spots. Never place it under the lower back or neck.'},
+  ],
+  mobility:[
+    {name:'Supine Spinal Twist',dur:'60 sec each side',eachSide:true,
+     what:'Lie on your back. Hug one knee to your chest, then guide it across your body to the opposite side. Extend your arm out and look away from the knee. Keep both shoulders flat. Hold for the full duration, then switch.',
+     why:'Mobility sessions move the hips through large ranges across multiple planes. The spinal twist acts as a reset — decompressing the lumbar spine and restoring rotational mobility that mobility work can fatigue.',
+     feel:'Rotation through the mid and lower back. Both shoulders stay flat on the floor. Let the weight of the leg do the work.'},
+    {name:'90/90 Hip Stretch',dur:'45 sec each side',eachSide:true,
+     what:'Sit on the floor with both legs bent at 90°. Front leg in front (shin parallel to your torso), rear leg to the side (shin going back). Sit tall and hold. Hinge forward over the front leg to increase intensity.',
+     why:'This stretch simultaneously targets internal rotation (front hip) and external rotation (rear hip) — making it the most comprehensive single hip stretch available. After mobility sessions, it acts as a consolidating hold letting both directions release simultaneously.',
+     feel:'Deep in the outer hip of the front leg and the front of the hip of the rear leg. Sit as tall as possible — collapsing the torso reduces effectiveness significantly.'},
+  ],
+  full:[
+    {name:"Child's Pose",dur:'60 sec',eachSide:false,
+     what:'Kneel and sit your hips back toward your heels. Reach both arms as far forward as possible on the floor. Rest your forehead on the ground and breathe deeply into your back. Stay completely passive.',
+     why:'After a full-body session loading the posterior chain and lats, child\'s pose provides a full-length passive decompression of the spine and a gentle bilateral lat stretch in one position. It is the most efficient single cooldown stretch available.',
+     feel:'A broad stretch across the whole back that widens with each exhale. If your hips do not reach your heels, place a rolled blanket between them.'},
+    {name:'Supine Spinal Twist',dur:'45 sec each side',eachSide:true,
+     what:'Lie on your back. Hug your right knee to your chest, then guide it across your body to the left. Extend your right arm to the side and look right. Keep both shoulders flat. Hold, then switch.',
+     why:'A full-body session compresses the spine across multiple planes. The spinal twist decompresses and rotates the lumbar and thoracic spine, releases the paraspinals, and improves rotational mobility all at once.',
+     feel:'Rotation through the mid and lower back. The top shoulder stays flat on the floor. The stretch typically deepens noticeably after the first 20 seconds.'},
+    {name:'Standing Hamstring Stretch',dur:'45 sec each side',eachSide:true,
+     what:'Place one heel on a low surface. Keep both legs relatively straight. Hinge forward from the hip — not the lower back — and reach toward your foot. Keep your back as flat as possible.',
+     why:'Full-body sessions virtually always include hinge or squat patterns that load the hamstrings. Stretching them while warm is the most effective time to increase hamstring length and reduce next-day stiffness.',
+     feel:'The back of the raised leg from below the glute to behind the knee. Focus on hinging from the hip. If you feel it more in your back than your leg, raise the surface slightly.'},
+    {name:'Deep Squat Hold',dur:'60 sec',eachSide:false,
+     what:'Stand with feet slightly wider than shoulder-width, toes turned out. Lower into a full squat with hips below your knees. Hold a KB in front as a counterweight if needed. Stay for the full 60 seconds and breathe.',
+     why:'The deep squat hold simultaneously tests and develops hip, ankle, and thoracic mobility. How it feels week to week is one of the clearest indicators of improving overall mobility — it should get progressively easier throughout the program.',
+     feel:'A combined stretch in the hips, inner thighs, ankles, and thoracic spine. Relax into the position — fighting it makes it harder. With each exhale let your hips sink slightly lower.'},
+  ],
+}
+
+// ─── WIZARD STATE ────────────────────────────────────────────────────────────
+const DAYS_OF_WEEK = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const FOCUS_OPTIONS = [
+  {val:'push',    label:'Push (chest, shoulders, triceps)'},
+  {val:'pull',    label:'Pull (back, biceps)'},
+  {val:'hinge',   label:'Hinge (hamstrings, glutes)'},
+  {val:'squat',   label:'Squat (quads, glutes)'},
+  {val:'core',    label:'Core & carries'},
+  {val:'mobility',label:'Mobility & recovery'},
+  {val:'full',    label:'Full body'},
+  {val:'power',   label:'Power & KB complex'},
+];
+
+let wiz = {
+  step: 1,
+  weeks: 10,
+  days: [],
+  sessionMins: null,
+  equipment: ['bw'],
+  dayFocus: {},
+  level: null,
+  cooldown: null,
+  progression: null,
+};
+
+// ─── TRACKER STATE ───────────────────────────────────────────────────────────
+const LS_KEY = 'homeWorkoutBuilder';
+const CURRENT_VERSION = 1;
+
+// ─── MIGRATIONS ──────────────────────────────────────────────────────────────
+// Each migration takes the raw saved object and returns an upgraded version.
+// Add a new entry here whenever you change the shape of program or tracker.
+// Never delete old migrations — they chain together.
+const MIGRATIONS = {
+  // v0 → v1: legacy key rename (strengthBuilder_v1 → homeWorkoutBuilder)
+  // handled separately in init() by checking old key
+};
+
+function migrate(saved) {
+  let version = saved.version || 0;
+
+  // Run each migration in order
+  while (version < CURRENT_VERSION) {
+    const migFn = MIGRATIONS[version];
+    if (migFn) {
+      try {
+        saved = migFn(saved);
+      } catch(e) {
+        console.warn(`Migration v${version} failed:`, e);
+        return null; // migration failed — will prompt reset
+      }
+    }
+    version++;
+    saved.version = version;
+  }
+  return saved;
+}
+
+let program = null;
+let tracker = {
+  currentWeek: 1,
+  currentDayTab: 0,
+  checked: {},
+  sections: {},
+};
+let openExp = {};
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+function init() {
+  let saved = null;
+
+  try {
+    // Check new key first
+    const raw = localStorage.getItem(LS_KEY);
+    if (raw) {
+      saved = JSON.parse(raw);
+    } else {
+      // Check legacy key and migrate it across
+      const legacy = localStorage.getItem('strengthBuilder_v1');
+      if (legacy) {
+        saved = JSON.parse(legacy);
+        saved.version = 0;
+        localStorage.removeItem('strengthBuilder_v1');
+      }
+    }
+  } catch(e) { saved = null; }
+
+  if (saved) {
+    // Run migrations if needed
+    if ((saved.version || 0) < CURRENT_VERSION) {
+      saved = migrate(saved);
+    }
+
+    if (saved && saved.program && saved.tracker) {
+      // Validate basic structure before using
+      if (isValidSave(saved)) {
+        program = saved.program;
+        tracker = saved.tracker;
+        saveState(); // write back with updated version
+        showTracker();
+        return;
+      } else {
+        // Structure is unrecognisable — warn and offer reset
+        showCorruptWarning();
+        return;
+      }
+    }
+  }
+
+  buildDayPicker();
+  showWizard();
+  updateWizProgress();
+}
+
+function isValidSave(saved) {
+  try {
+    return (
+      saved.program &&
+      Array.isArray(saved.program.weeks) &&
+      saved.program.weeks.length > 0 &&
+      saved.tracker &&
+      typeof saved.tracker.currentWeek === 'number' &&
+      typeof saved.tracker.checked === 'object'
+    );
+  } catch(e) { return false; }
+}
+
+function showCorruptWarning() {
+  // Render a simple recovery screen
+  document.getElementById('wizard').style.display = 'none';
+  document.getElementById('tracker').style.display = 'none';
+  const warn = document.createElement('div');
+  warn.style.cssText = 'padding:32px 20px;text-align:center;';
+  warn.innerHTML = `
+    <div style="font-family:Bebas Neue,sans-serif;font-size:2rem;letter-spacing:0.05em;color:#111;margin-bottom:10px">Saved data issue</div>
+    <p style="font-size:0.82rem;color:#888;line-height:1.6;margin-bottom:24px">Your saved program couldn't be loaded — it may be from an older version of the app that isn't compatible. You can start fresh or contact support if you want your progress recovered.</p>
+    <button onclick="forceReset()" style="padding:14px 28px;background:#ff3d00;color:#fff;border:none;border-radius:8px;font-family:Bebas Neue,sans-serif;font-size:1.2rem;letter-spacing:0.1em;cursor:pointer;">Start Fresh</button>`;
+  document.body.prepend(warn);
+}
+
+function forceReset() {
+  localStorage.removeItem(LS_KEY);
+  localStorage.removeItem('strengthBuilder_v1');
+  location.reload();
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify({
+      version: CURRENT_VERSION,
+      program,
+      tracker,
+    }));
+  } catch(e) {
+    console.warn('Save failed:', e);
+  }
+}
+
+function resetProgram() {
+  if (!confirm('Start a new program? Your current progress will be lost.')) return;
+  localStorage.removeItem(LS_KEY);
+  program = null;
+  tracker = {currentWeek:1, currentDayTab:0, checked:{}, sections:{}};
+  openExp = {};
+  wiz = {step:1, weeks:10, days:[], sessionMins:null, equipment:['bw'], dayFocus:{}, level:null, cooldown:null, progression:null};
+  document.getElementById('reset-btn').style.display = 'none';
+  document.getElementById('edit-btn').style.display = 'none';
+  buildDayPicker();
+  showWizard();
+  document.querySelectorAll('.wizard-step').forEach(s=>s.classList.remove('active'));
+  document.getElementById('step-1').classList.add('active');
+  updateWizProgress();
+}
+
+function editProgram() {
+  if (!program) return;
+  // Pre-populate wiz from current program settings
+  const saved = program.wiz;
+  wiz = {
+    step: 1,
+    weeks: saved.weeks,
+    days: [...saved.days],
+    sessionMins: saved.sessionMins,
+    equipment: [...saved.equipment],
+    dayFocus: {...saved.dayFocus},
+    level: saved.level,
+    cooldown: saved.cooldown,
+    progression: saved.progression,
+  };
+  // Rebuild day picker with saved selections
+  buildDayPicker();
+  saved.days.forEach(idx => {
+    document.querySelector(`.day-btn[data-idx="${idx}"]`)?.classList.add('selected');
+  });
+  const cnt = wiz.days.length;
+  document.getElementById('day-count').textContent = cnt + ' day' + (cnt!==1?'s':'') + ' selected';
+  document.getElementById('btn-next-2').disabled = cnt < 1;
+
+  // Restore week slider
+  document.getElementById('weeks-slider').value = wiz.weeks;
+  document.getElementById('weeks-val').textContent = wiz.weeks + ' weeks';
+
+  // Restore session length selection
+  if (wiz.sessionMins) {
+    document.querySelector(`.opt-card[data-val="${wiz.sessionMins}"]`)?.classList.add('selected');
+    document.getElementById('btn-next-3').disabled = false;
+  }
+
+  // Restore equipment
+  document.querySelectorAll('.equip-grid .opt-card').forEach(c => {
+    c.classList.toggle('selected', wiz.equipment.includes(c.dataset.val));
+  });
+
+  // Restore level
+  if (wiz.level) {
+    document.querySelector(`#step-6 .opt-card[data-val="${wiz.level}"]`)?.classList.add('selected');
+    document.getElementById('btn-next-6').disabled = false;
+  }
+
+  // Restore cooldown
+  if (wiz.cooldown) {
+    document.querySelector(`#step-7 .opt-card[data-val="${wiz.cooldown}"]`)?.classList.add('selected');
+    document.getElementById('btn-next-7').disabled = false;
+  }
+
+  // Restore progression
+  if (wiz.progression) {
+    document.querySelector(`#step-8 .opt-card[data-val="${wiz.progression}"]`)?.classList.add('selected');
+    document.getElementById('btn-build').disabled = false;
+  }
+
+  // Change build button label
+  document.getElementById('btn-build').textContent = 'Save Changes ✓';
+
+  document.querySelectorAll('.wizard-step').forEach(s=>s.classList.remove('active'));
+  document.getElementById('step-1').classList.add('active');
+  wiz.step = 1;
+  showWizard();
+  updateWizProgress();
+}
+
+// ─── WIZARD HELPERS ──────────────────────────────────────────────────────────
+function showWizard() {
+  document.getElementById('wizard').style.display = 'block';
+  document.getElementById('tracker').style.display = 'none';
+}
+function showTracker() {
+  document.getElementById('wizard').style.display = 'none';
+  document.getElementById('tracker').style.display = 'block';
+  document.getElementById('reset-btn').style.display = 'block';
+  document.getElementById('edit-btn').style.display = 'block';
+  // Reset build button label in case it was changed by edit
+  document.getElementById('btn-build').textContent = 'Build My Program ✓';
+  renderTracker();
+}
+
+function updateWizProgress() {
+  document.getElementById('wiz-progress').style.width = ((wiz.step-1)/8*100)+'%';
+}
+
+function nextStep() {
+  document.getElementById('step-'+wiz.step).classList.remove('active');
+  wiz.step++;
+  if (wiz.step === 5) buildFocusRows();
+  document.getElementById('step-'+wiz.step).classList.add('active');
+  updateWizProgress();
+}
+function prevStep() {
+  document.getElementById('step-'+wiz.step).classList.remove('active');
+  wiz.step--;
+  document.getElementById('step-'+wiz.step).classList.add('active');
+  updateWizProgress();
+}
+
+function updateSlider(type, val) {
+  if (type === 'weeks') {
+    wiz.weeks = parseInt(val);
+    document.getElementById('weeks-val').textContent = val + ' weeks';
+  }
+}
+
+function buildDayPicker() {
+  const grid = document.getElementById('day-picker');
+  grid.innerHTML = DAYS_OF_WEEK.map((d,i) =>
+    `<div class="day-btn" data-idx="${i}" onclick="toggleDay(${i})"><div class="day-name">${d}</div></div>`
+  ).join('');
+}
+
+function toggleDay(idx) {
+  const btn = document.querySelector(`.day-btn[data-idx="${idx}"]`);
+  if (wiz.days.includes(idx)) {
+    wiz.days = wiz.days.filter(d=>d!==idx);
+    btn.classList.remove('selected');
+  } else {
+    wiz.days.push(idx);
+    btn.classList.add('selected');
+  }
+  wiz.days.sort((a,b)=>a-b);
+  const cnt = wiz.days.length;
+  document.getElementById('day-count').textContent = cnt + ' day' + (cnt!==1?'s':'') + ' selected';
+  document.getElementById('btn-next-2').disabled = cnt < 1;
+}
+
+function selectOpt(el, type) {
+  el.closest('.option-grid').querySelectorAll('.opt-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  if (type === 'session') {
+    wiz.sessionMins = parseInt(el.dataset.val);
+    document.getElementById('btn-next-3').disabled = false;
+  } else if (type === 'level') {
+    wiz.level = el.dataset.val;
+    document.getElementById('btn-next-6').disabled = false;
+  } else if (type === 'cooldown') {
+    wiz.cooldown = el.dataset.val;
+    document.getElementById('btn-next-7').disabled = false;
+  } else if (type === 'progression') {
+    wiz.progression = el.dataset.val;
+    document.getElementById('btn-build').disabled = false;
+  }
+}
+
+function toggleEquip(el) {
+  const val = el.dataset.val;
+  if (val === 'bw') return; // always selected
+  if (el.classList.contains('selected')) {
+    el.classList.remove('selected');
+    wiz.equipment = wiz.equipment.filter(e=>e!==val);
+  } else {
+    el.classList.add('selected');
+    wiz.equipment.push(val);
+  }
+}
+
+function buildFocusRows() {
+  const container = document.getElementById('focus-rows');
+  container.innerHTML = wiz.days.map(dayIdx => {
+    const opts = FOCUS_OPTIONS.map(f =>
+      `<option value="${f.val}" ${wiz.dayFocus[dayIdx]===f.val?'selected':''}>${f.label}</option>`
+    ).join('');
+    return `<div class="focus-row">
+      <div class="focus-day-label">${DAYS_OF_WEEK[dayIdx]}</div>
+      <select class="focus-select" onchange="wiz.dayFocus[${dayIdx}]=this.value">
+        <option value="">Pick a focus…</option>${opts}
+      </select>
+    </div>`;
+  }).join('');
+  // Set defaults if not set
+  wiz.days.forEach((dayIdx,i) => {
+    if (!wiz.dayFocus[dayIdx]) {
+      const defaults = ['push','pull','hinge','squat','core','full','power','mobility'];
+      wiz.dayFocus[dayIdx] = defaults[i % defaults.length];
+      container.querySelectorAll('.focus-select')[i].value = wiz.dayFocus[dayIdx];
+    }
+  });
+}
+
+// ─── PROGRAM BUILDER ─────────────────────────────────────────────────────────
+function buildProgram() {
+  const totalWeeks = wiz.weeks;
+  // If fixed or manual, use single flat phase
+  let phases;
+  if (wiz.progression === 'fixed' || wiz.progression === 'manual') {
+    phases = [{
+      startWeek:1, endWeek:totalWeeks,
+      name: wiz.progression === 'fixed' ? 'Fixed Program' : 'Your Program',
+      cls:'phase-1', bannerCls:'p1',
+      desc: wiz.progression === 'fixed'
+        ? '<strong>Fixed difficulty.</strong> Same exercises and reps every week. Focus on quality and consistency.'
+        : '<strong>Manual progression.</strong> Use the form notes to decide when to push harder. You\'re in control.',
+      roundMult:0, progressionLevel:0
+    }];
+  } else {
+    phases = buildPhases(totalWeeks);
+  }
+
+  const sessionCfg = {
+    10: {rounds:2, exCount:4},
+    15: {rounds:3, exCount:4},
+    20: {rounds:3, exCount:5},
+    30: {rounds:4, exCount:6},
+  }[wiz.sessionMins] || {rounds:3, exCount:4};
+
+  const weeks = [];
+  for (let w = 1; w <= totalWeeks; w++) {
+    const phase = phases.find(p => w >= p.startWeek && w <= p.endWeek);
+    const prog = weekProgression(w, totalWeeks, wiz.progression);
+    const weekDays = [];
+    for (let d = 0; d < 7; d++) {
+      if (wiz.days.includes(d)) {
+        const focus = wiz.dayFocus[d] || 'full';
+        const exercises = selectExercises(focus, wiz.equipment, wiz.level, sessionCfg.exCount, phase, w, totalWeeks, wiz.progression);
+        // Rounds: base + weekly increment, min 1, max 5, test week = 2
+        let rounds = prog.isTest
+          ? 2
+          : Math.min(Math.max(sessionCfg.rounds + prog.roundsAdd, 1), 5);
+        weekDays.push({
+          type: 'workout',
+          dayName: DAYS_OF_WEEK[d],
+          focus,
+          focusLabel: FOCUS_OPTIONS.find(f=>f.val===focus)?.label || focus,
+          rounds,
+          exercises,
+          stretches: wiz.cooldown === 'yes' ? (STRETCHES[focus] || STRETCHES.full) : [],
+        });
+      } else {
+        weekDays.push({type:'rest', dayName: DAYS_OF_WEEK[d]});
+      }
+    }
+    weeks.push({weekNum:w, phase, days:weekDays});
+  }
+
+  program = {weeks, phases, totalWeeks, wiz:{...wiz}};
+  // Preserve progress if editing, reset if brand new
+  const isEditing = !!tracker.checked && Object.keys(tracker.checked).length > 0;
+  if (!isEditing) {
+    tracker = {currentWeek:1, currentDayTab: wiz.days[0] ?? 0, checked:{}, sections:{}};
+  } else {
+    // Keep existing progress, just update position if needed
+    tracker.currentDayTab = wiz.days.includes(tracker.currentDayTab) ? tracker.currentDayTab : (wiz.days[0] ?? 0);
+  }
+  saveState();
+  showTracker();
+}
+
+function buildPhases(totalWeeks) {
+  if (totalWeeks <= 4) {
+    return [{startWeek:1, endWeek:totalWeeks, name:'Build', cls:'phase-1', bannerCls:'p1',
+      desc:'<strong>Build phase.</strong> Lock in form. Quality over quantity.',
+      roundMult:0, progressionLevel:0}];
+  }
+  if (totalWeeks <= 8) {
+    const mid = Math.floor(totalWeeks/2);
+    return [
+      {startWeek:1, endWeek:mid, name:'Phase 1 · Build', cls:'phase-1', bannerCls:'p1',
+       desc:'<strong>Phase 1 · Build.</strong> Lock in movement quality. Nail every cue.',
+       roundMult:0, progressionLevel:0},
+      {startWeek:mid+1, endWeek:totalWeeks-1, name:'Phase 2 · Volume', cls:'phase-2', bannerCls:'p2',
+       desc:'<strong>Phase 2 · Volume.</strong> Add rounds. Same movements, more work.',
+       roundMult:1, progressionLevel:1},
+      {startWeek:totalWeeks, endWeek:totalWeeks, name:'Test Week', cls:'phase-4', bannerCls:'p4',
+       desc:'<strong>Test week.</strong> Max effort. Track your numbers.',
+       roundMult:0, progressionLevel:3},
+    ];
+  }
+  // 9+ weeks — full 4 phase
+  const p1end = Math.round(totalWeeks * 0.3);
+  const p2end = Math.round(totalWeeks * 0.6);
+  const p3end = totalWeeks - 1;
+  return [
+    {startWeek:1, endWeek:p1end, name:'Phase 1 · Build', cls:'phase-1', bannerCls:'p1',
+     desc:'<strong>Phase 1 · Build.</strong> Lock in movement quality. Nail every cue before adding load.',
+     roundMult:0, progressionLevel:0},
+    {startWeek:p1end+1, endWeek:p2end, name:'Phase 2 · Volume', cls:'phase-2', bannerCls:'p2',
+     desc:'<strong>Phase 2 · Volume.</strong> More rounds, longer holds. Same movements, more work.',
+     roundMult:1, progressionLevel:1},
+    {startWeek:p2end+1, endWeek:p3end, name:'Phase 3 · Intensity', cls:'phase-3', bannerCls:'p3',
+     desc:'<strong>Phase 3 · Intensity.</strong> Harder variations, heavier where applicable.',
+     roundMult:1, progressionLevel:2},
+    {startWeek:totalWeeks, endWeek:totalWeeks, name:'Phase 4 · Test', cls:'phase-4', bannerCls:'p4',
+     desc:'<strong>Phase 4 · Test week.</strong> 2 rounds, max effort. Track push-up max, plank hold, hollow hold.',
+     roundMult:-1, progressionLevel:3},
+  ];
+}
+
+function selectExercises(focus, equipment, level, count, phase, weekNum, totalWeeks) {
+  // Map focus to primary patterns
+  const patternMap = {
+    push:     ['push','core'],
+    pull:     ['pull','core'],
+    hinge:    ['hinge','core'],
+    squat:    ['squat','core'],
+    core:     ['core','carry','mobility'],
+    mobility: ['mobility','core'],
+    full:     ['push','hinge','squat','pull','core'],
+    power:    ['power','hinge','push','core'],
+  };
+  const patterns = patternMap[focus] || ['push','pull','hinge','squat','core'];
+
+  // Filter library by equipment
+  const available = LIBRARY.filter(ex => {
+    if (!ex.equip || ex.equip.length === 0) return true;
+    return ex.equip.some(e => equipment.includes(e));
+  });
+
+  // Score and pick exercises
+  const picked = [];
+  const usedIds = new Set();
+
+  // Pick 1–2 from primary pattern, then fill from secondary
+  const primaryPattern = patterns[0];
+  const primaryPool = available.filter(e => e.pattern === primaryPattern && !usedIds.has(e.id));
+  const primary = pickFromPool(primaryPool, level, phase, Math.min(2, Math.ceil(count/2)));
+  primary.forEach(e => { picked.push(e); usedIds.add(e.id); });
+
+  // Fill remaining from other patterns
+  for (let pi = 1; pi < patterns.length && picked.length < count; pi++) {
+    const pool = available.filter(e => e.pattern === patterns[pi] && !usedIds.has(e.id));
+    const picks = pickFromPool(pool, level, phase, 1);
+    picks.forEach(e => { picked.push(e); usedIds.add(e.id); });
+  }
+
+  // If still need more, fill from any available
+  if (picked.length < count) {
+    const remaining = available.filter(e => !usedIds.has(e.id));
+    const fills = pickFromPool(remaining, level, phase, count - picked.length);
+    fills.forEach(e => { picked.push(e); usedIds.add(e.id); });
+  }
+
+  return picked.slice(0, count).map(ex => formatExercise(ex, level, phase));
+}
+
+function pickFromPool(pool, level, phase, n) {
+  // Prefer exercises that have a variant for this level
+  const levelOrder = ['beginner','intermediate','advanced'];
+  const levelIdx = levelOrder.indexOf(level);
+  const scored = pool.map(ex => {
+    const hasExact = ex.variants && ex.variants.some(v=>v.level===level);
+    return {ex, score: hasExact ? 1 : 0};
+  }).sort((a,b) => b.score - a.score);
+  return scored.slice(0, n).map(s=>s.ex);
+}
+
+// ─── PROGRESSION ENGINE ──────────────────────────────────────────────────────
+function weekProgression(weekNum, totalWeeks, progression) {
+  if (progression !== 'auto') return { roundsAdd:0, repAdd:0, secAdd:0, variantStep:0, isTest:false };
+  const isTest = weekNum === totalWeeks;
+  if (isTest) return { roundsAdd:-99, repAdd:0, secAdd:0, variantStep:0, isTest:true };
+
+  // Normalise position across non-test weeks (0 → 1)
+  const pos = (weekNum - 1) / Math.max(totalWeeks - 2, 1);
+
+  // Rounds: ramp up gradually — +1 round roughly every 2–3 weeks
+  const roundsAdd = Math.floor(pos * 3.5);
+
+  // Variant steps up at 60% of the program
+  const variantStep = pos >= 0.6 ? 1 : 0;
+
+  // Week within current variant block (resets when variant steps up)
+  const variantChangeWeek = Math.round((totalWeeks - 1) * 0.6);
+  const weekInBlock = variantStep === 0
+    ? weekNum - 1
+    : weekNum - variantChangeWeek;
+
+  const repAdd = Math.min(Math.max(weekInBlock, 0), 6);   // +1/week, cap +6
+  const secAdd = Math.min(Math.max(weekInBlock * 5, 0), 30); // +5 sec/week, cap +30
+
+  return { roundsAdd, repAdd, secAdd, variantStep, isTest };
+}
+
+function formatExercise(ex, level, phase, weekNum, totalWeeks, progression) {
+  const levelOrder = ['beginner','intermediate','advanced'];
+  const levelIdx = Math.max(0, levelOrder.indexOf(level));
+  const prog = weekProgression(weekNum || 1, totalWeeks || 1, progression || 'fixed');
+
+  // Pick variant
+  const variantLevelIdx = prog.variantStep > 0 ? Math.min(levelIdx + 1, 2) : levelIdx;
+  let variant = ex.variants && ex.variants.find(v => v.level === levelOrder[variantLevelIdx]);
+  if (!variant) variant = ex.variants && (ex.variants.find(v => v.level === level) || ex.variants[ex.variants.length - 1]);
+  if (!variant) variant = { label: '10 reps', timed: false };
+
+  // Test week
+  if (prog.isTest) {
+    return {
+      id: ex.id, name: ex.name,
+      label: variant.timed ? 'MAX HOLD — note your time' : 'MAX REPS — note your count',
+      tag: 'test', what: ex.what, why: ex.why, cues: ex.cues, timerSecs: 0,
+    };
+  }
+
+  const isProgressed = prog.variantStep > 0 && variantLevelIdx > levelIdx;
+  let label = variant.label;
+  let tag = isProgressed ? 'new' : '';
+
+  if (variant.timed && variant.secs) {
+    // Timed — add seconds
+    const newSecs = variant.secs + prog.secAdd;
+    label = label.match(/each side/i) ? `${newSecs} sec each side` : `${newSecs} sec`;
+  } else {
+    // Rep-based — parse and increment
+    const repMatch = label.match(/^(\d+)(?:–(\d+))?\s*reps?(.*)/i);
+    if (repMatch) {
+      const base = parseInt(repMatch[1]);
+      const top = repMatch[2] ? parseInt(repMatch[2]) : null;
+      const suffix = repMatch[3] || '';
+      label = top
+        ? `${base + prog.repAdd}–${top + prog.repAdd} reps${suffix}`
+        : `${base + prog.repAdd} reps${suffix}`;
+    }
+    // Distance/carry labels — leave unchanged
+  }
+
+  const timerSecs = variant.timed && variant.secs
+    ? (variant.secs + prog.secAdd)
+    : (label.match(/(\d+)\s*sec/i) ? parseInt(label.match(/(\d+)\s*sec/i)[1]) : 0);
+
+  return {
+    id: ex.id, name: ex.name, label, tag,
+    what: ex.what, why: ex.why, cues: ex.cues,
+    timerSecs: timerSecs >= 5 ? timerSecs : 0,
+  };
+}
+
+function selectExercises(focus, equipment, level, count, phase, weekNum, totalWeeks, progression) {
+  const patternMap = {
+    push:['push','core'], pull:['pull','core'], hinge:['hinge','core'],
+    squat:['squat','core'], core:['core','carry','mobility'],
+    mobility:['mobility','core'], full:['push','hinge','squat','pull','core'],
+    power:['power','hinge','push','core'],
+  };
+  const patterns = patternMap[focus] || ['push','pull','hinge','squat','core'];
+  const available = LIBRARY.filter(ex =>
+    !ex.equip || ex.equip.length === 0 || ex.equip.some(e => equipment.includes(e))
+  );
+  const picked = [], usedIds = new Set();
+  const primaryPool = available.filter(e => e.pattern === patterns[0] && !usedIds.has(e.id));
+  pickFromPool(primaryPool, level, phase, Math.min(2, Math.ceil(count/2))).forEach(e => { picked.push(e); usedIds.add(e.id); });
+  for (let pi = 1; pi < patterns.length && picked.length < count; pi++) {
+    pickFromPool(available.filter(e => e.pattern === patterns[pi] && !usedIds.has(e.id)), level, phase, 1)
+      .forEach(e => { picked.push(e); usedIds.add(e.id); });
+  }
+  if (picked.length < count) {
+    pickFromPool(available.filter(e => !usedIds.has(e.id)), level, phase, count - picked.length)
+      .forEach(e => { picked.push(e); usedIds.add(e.id); });
+  }
+  return picked.slice(0, count).map(ex => formatExercise(ex, level, phase, weekNum, totalWeeks, progression));
+}
+
+function pickFromPool(pool, level, phase, n) {
+  // Prefer exercises that have a variant for this level
+  const levelOrder = ['beginner','intermediate','advanced'];
+  const levelIdx = levelOrder.indexOf(level);
+  const scored = pool.map(ex => {
+    const hasExact = ex.variants && ex.variants.some(v=>v.level===level);
+    return {ex, score: hasExact ? 1 : 0};
+  }).sort((a,b) => b.score - a.score);
+  return scored.slice(0, n).map(s=>s.ex);
+}
+
+function formatExercise(ex, level, phase) {
+  const pl = (phase && phase.progressionLevel != null) ? phase.progressionLevel : 0;
+  const levelOrder = ['beginner','intermediate','advanced'];
+  const levelIdx = Math.max(0, levelOrder.indexOf(level));
+
+  let variantLevelIdx = levelIdx;
+  if (pl >= 2) variantLevelIdx = Math.min(levelIdx + 1, 2);
+
+  let variant = ex.variants && ex.variants.find(v => v.level === levelOrder[variantLevelIdx]);
+  if (!variant) variant = ex.variants && (ex.variants.find(v=>v.level===level) || ex.variants[ex.variants.length-1]);
+
+  let label = variant ? variant.label : '10 reps';
+  let tag = '';
+  if (pl === 3) { label = `MAX EFFORT`; tag = 'test'; }
+  else if (pl >= 2 && variantLevelIdx > levelIdx) tag = 'new';
+  else if (pl >= 1) tag = '';
+
+  const timerSecs = variant && variant.timed ? variant.secs : (label.match(/(\d+)\s*sec/i) ? parseInt(label.match(/(\d+)\s*sec/i)[1]) : 0);
+
+  return {
+    id: ex.id,
+    name: ex.name,
+    label,
+    tag,
+    what: ex.what,
+    why: ex.why,
+    cues: ex.cues,
+    timerSecs: timerSecs >= 5 ? timerSecs : 0,
+  };
+}
+
+// ─── RENDER CUES ─────────────────────────────────────────────────────────────
+function renderCues(cues) {
+  if (!cues) return '';
+  const steps = cues.split('|');
+  if (steps.length <= 1) {
+    // Fallback: plain text for anything not yet converted
+    return `<div class="explainer-text">${cues}</div>`;
+  }
+  const items = steps.map((step, i) =>
+    `<li class="cue-step"><span class="cue-step-num">${i+1}</span><span>${step.trim()}</span></li>`
+  ).join('');
+  return `<ol class="cue-steps">${items}</ol>`;
+}
+
+// ─── TRACKER RENDER ──────────────────────────────────────────────────────────
+function renderTracker() {
+  if (!program) return;
+  renderWeekGrid();
+  renderDayTabs();
+  renderDay();
+}
+
+function renderWeekGrid() {
+  const grid = document.getElementById('week-grid');
+  const cols = Math.min(program.totalWeeks, 10);
+  grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+  grid.innerHTML = '';
+  for (let w = 1; w <= program.totalWeeks; w++) {
+    const done = isWeekDone(w);
+    const btn = document.createElement('div');
+    btn.className = 'week-btn' + (w===tracker.currentWeek?' active':'') + (done?' completed':'');
+    btn.innerHTML = `<div>W${w}</div>`;
+    btn.onclick = () => selectWeek(w);
+    grid.appendChild(btn);
+  }
+  // Phase badge in header
+  const weekData = program.weeks[tracker.currentWeek-1];
+  const phase = weekData?.phase;
+  let badge = document.querySelector('.phase-badge');
+  if (!badge) {
+    badge = document.createElement('div');
+    badge.className = 'phase-badge';
+    document.querySelector('header .hdr-btn')?.before(badge);
+  }
+  badge.className = `phase-badge ${phase?.cls||'phase-1'}`;
+  badge.textContent = phase?.name || '';
+
+  // Banner — enrich with week-specific progression info
+  const banner = document.getElementById('prog-banner');
+  banner.className = `prog-banner ${phase?.bannerCls||'p1'}`;
+  const prog = weekProgression(tracker.currentWeek, program.totalWeeks, program.wiz.progression);
+  const sessionBase = {10:2,15:3,20:3,30:4}[program.wiz.sessionMins] || 3;
+  const thisWeekRounds = prog.isTest ? 2 : Math.min(Math.max(sessionBase + prog.roundsAdd, 1), 5);
+  const variantNote = prog.variantStep > 0 ? ' · Harder exercise variants this block.' : '';
+  const testNote = prog.isTest ? ' Go to max effort on every exercise and note your scores.' : '';
+  banner.innerHTML = (phase?.desc || '') +
+    (program.wiz.progression === 'auto'
+      ? `<br><span style="opacity:0.8">Week ${tracker.currentWeek}: <strong>${thisWeekRounds} rounds</strong>${variantNote}${testNote}</span>`
+      : '');
+}
+
+function isWeekDone(w) {
+  const weekData = program.weeks[w-1];
+  if (!weekData) return false;
+  for (let d = 0; d < 7; d++) {
+    const day = weekData.days[d];
+    if (!day || day.type !== 'workout') continue;
+    const hasAny = day.exercises.some((_,ei) => tracker.checked[ck(w,d,ei)]);
+    if (!hasAny) return false;
+  }
+  return true;
+}
+
+function ck(w,d,ei) { return `${w}-${d}-${ei}`; }
+function sk(w,d) { return `${w}-${d}`; }
+function getSection(w,d) { return tracker.sections[sk(w,d)] || 'workout'; }
+function getRounds(w,d,ei) { return tracker.checked[ck(w,d,ei)] || 0; }
+
+function renderDayTabs() {
+  const tabs = document.getElementById('day-tabs');
+  const weekData = program.weeks[tracker.currentWeek-1];
+  if (!weekData) return;
+  tabs.innerHTML = weekData.days.map((day,d) => {
+    const isActive = d === tracker.currentDayTab;
+    const isRest = day.type === 'rest';
+    const done = !isRest && day.type === 'workout' && day.exercises.every((_,ei) => getRounds(tracker.currentWeek,d,ei) >= day.rounds);
+    return `<div class="tab ${isActive?'active':''} ${isRest?'rest-tab':''} ${done?'done':''}" 
+      onclick="selectDayTab(${d})">${day.dayName}</div>`;
+  }).join('');
+}
+
+function selectWeek(w) {
+  tracker.currentWeek = w;
+  // Jump to first workout day of the week
+  const weekData = program.weeks[w-1];
+  const firstWorkout = weekData?.days.findIndex(d=>d.type==='workout');
+  if (firstWorkout !== -1) tracker.currentDayTab = firstWorkout;
+  saveState();
+  renderWeekGrid();
+  renderDayTabs();
+  renderDay();
+}
+
+function selectDayTab(d) {
+  tracker.currentDayTab = d;
+  saveState();
+  renderDayTabs();
+  renderDay();
+}
+
+function switchSection(sec) {
+  tracker.sections[sk(tracker.currentWeek, tracker.currentDayTab)] = sec;
+  saveState();
+  renderDay();
+}
+
+function isWeekDone(w) {
+  const weekData = program.weeks[w-1];
+  if (!weekData) return false;
+  for (let d = 0; d < 7; d++) {
+    const day = weekData.days[d];
+    if (!day || day.type !== 'workout') continue;
+    const hasAny = day.exercises.some((_,ei) => getRounds(w,d,ei) > 0);
+    if (!hasAny) return false;
+  }
+  return true;
+}
+
+function toggleEx(d, ei) {
+  const w = tracker.currentWeek;
+  const k = ck(w, d, ei);
+  const day = program.weeks[w-1].days[d];
+  const totalRounds = day.rounds;
+  const current = tracker.checked[k] || 0;
+  // Increment round, reset to 0 if already at max
+  tracker.checked[k] = current >= totalRounds ? 0 : current + 1;
+  saveState();
+  renderDayTabs();
+  renderDay();
+  renderWeekGrid();
+}
+
+function toggleExp(key) {
+  openExp[key] = !openExp[key];
+  renderDay();
+}
+
+function renderDay() {
+  const w = tracker.currentWeek;
+  const d = tracker.currentDayTab;
+  const weekData = program.weeks[w-1];
+  if (!weekData) return;
+  const day = weekData.days[d];
+  const content = document.getElementById('content');
+  if (!day) return;
+
+  if (day.type === 'rest') {
+    content.innerHTML = `
+      <div class="day-header">
+        <div class="day-name">${day.dayName}</div>
+        <div class="day-focus-tag">Rest Day</div>
+      </div>
+      <div class="rest-day-card">
+        <div class="rest-day-icon">💤</div>
+        <div class="rest-day-title">Recovery</div>
+        <div class="rest-day-note">Muscle protein synthesis peaks 24–36h after training. This is when you actually get stronger.<br><br>Go for a walk. Stretch if you want to move. Otherwise — rest.</div>
+      </div>`;
+    return;
+  }
+
+  const total = day.exercises.length;
+  const totalRounds = day.rounds;
+  const totalPips = total * totalRounds;
+  const filledPips = day.exercises.reduce((sum, _, ei) => sum + Math.min(getRounds(w,d,ei), totalRounds), 0);
+  const doneCount = day.exercises.filter((_,ei) => getRounds(w,d,ei) >= totalRounds).length;
+  const pct = totalPips > 0 ? Math.round((filledPips / totalPips) * 100) : 0;
+  const sec = getSection(w,d);
+  const roundsNote = `${day.rounds} rounds · ${program.wiz.sessionMins} min session`;
+
+  let html = `
+    <div class="day-header">
+      <div class="day-name">${day.dayName}</div>
+      <div class="day-focus-tag">${day.focusLabel}</div>
+    </div>
+    <div class="day-note">${roundsNote}</div>
+    <div class="section-tabs" ${!day.stretches.length ? 'style="display:none"' : ''}>
+      <div class="section-tab ${sec==='workout'?'active-workout':''}" onclick="switchSection('workout')">⚡ Workout</div>
+      <div class="section-tab ${sec==='stretch'?'active-stretch':''}" onclick="switchSection('stretch')">🧘 Cooldown</div>
+    </div>`;
+
+  if (sec === 'workout') {
+    html += `
+      <div class="progress-bar-wrap">
+        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+        <div class="progress-pct">${pct}%</div>
+      </div>
+      <div class="complete-msg ${doneCount===total?'show':''}">✓ Session complete — great work.</div>
+      <div class="circuit-label">Circuit · ${day.rounds} rounds</div>
+      <div class="exercises">`;
+
+    day.exercises.forEach((ex, ei) => {
+      const roundsDone = getRounds(w,d,ei);
+      const allDone = roundsDone >= totalRounds;
+      const expKey = `ex-${w}-${d}-${ei}`;
+      const isOpen = !!openExp[expKey];
+      const tagHtml = ex.tag ? `<span class="prog-tag ${ex.tag}">${ex.tag==='new'?'Progressed':ex.tag==='test'?'Max effort':'↑'}</span>` : '';
+      const timerBtn = ex.timerSecs >= 5
+        ? `<button class="timer-trigger" onclick="startTimer(${ex.timerSecs},'${ex.name.replace(/'/g,'')}')" title="Start timer">⏱</button>` : '';
+      // Build round pips
+      const pips = Array.from({length:totalRounds}, (_,i) =>
+        `<div class="round-pip ${i < roundsDone ? 'filled' : ''}"></div>`
+      ).join('');
+      const roundLabel = allDone ? '✓' : `${roundsDone}/${totalRounds}`;
+      html += `
+        <div class="ex-wrap">
+          <div class="ex-card ${allDone?'checked':''}">
+            <div class="ex-num">${ei+1}</div>
+            <div class="ex-info">
+              <div class="ex-name">${ex.name}${tagHtml}</div>
+              <div class="ex-detail"><strong>${ex.label}</strong></div>
+            </div>
+            <div class="ex-actions">
+              ${timerBtn}
+              <button class="swap-btn" onclick="openSwap(${d},${ei})" title="Swap exercise">⇄</button>
+              <button class="info-btn ${isOpen?'open':''}" onclick="toggleExp('${expKey}')">?</button>
+              <button class="round-btn ${allDone?'done':''}" onclick="toggleEx(${d},${ei})" title="Tap after each round">
+                <div class="round-counter">${pips}</div>
+                <span>${roundLabel}</span>
+              </button>
+            </div>
+          </div>
+          <div class="ex-explainer ${isOpen?'open':''}">
+            <div class="explainer-section"><div class="explainer-label">What it is</div><div class="explainer-text">${ex.what}</div></div>
+            <div class="explainer-section"><div class="explainer-label why">Why it's here</div><div class="explainer-text">${ex.why}</div></div>
+            <div class="explainer-section"><div class="explainer-label cues">How to do it</div>${renderCues(ex.cues)}</div>
+          </div>
+        </div>`;
+    });
+
+    html += `</div>
+      <div class="rest-tip">
+        <strong>Rest:</strong> 30 sec between exercises · 60 sec between rounds.<br>
+        <strong>Scaling:</strong> On heavy training days, drop 1 round. Never compromise recovery.
+      </div>`;
+
+  } else {
+    html += `<div class="circuit-label">Cooldown · ~5 min</div><div class="exercises">`;
+    (day.stretches || []).forEach((st,si) => {
+      const expKey = `st-${w}-${d}-${si}`;
+      const isOpen = !!openExp[expKey];
+      const timerSecs = parseDuration(st.dur);
+      const eachSide = st.eachSide || st.dur.toLowerCase().includes('each side');
+      const totalSides = eachSide ? 2 : 1;
+      const stretchKey = `stretch-${w}-${d}-${si}`;
+      const sidesDone = tracker.checked[stretchKey] || 0;
+      const allDone = sidesDone >= totalSides;
+
+      // Progress pips
+      const pips = Array.from({length:totalSides}, (_,i) =>
+        `<div class="round-pip ${i < sidesDone ? 'filled' : ''}"></div>`
+      ).join('');
+      const sideLabel = allDone ? '✓' : eachSide ? `${sidesDone}/2` : `${sidesDone}/1`;
+
+      const timerBtn = timerSecs >= 5
+        ? `<button class="timer-trigger stretch-timer" onclick="startStretchTimer(${timerSecs},'${st.name.replace(/'/g,'')}',${eachSide},'${stretchKey}')" title="Start timer">⏱</button>` : '';
+
+      html += `
+        <div class="ex-wrap">
+          <div class="ex-card stretch-card ${allDone?'checked':''}">
+            <div class="ex-num" style="color:${allDone?'var(--green)':'var(--blue)'};opacity:0.7">${si+1}</div>
+            <div class="ex-info">
+              <div class="ex-name" ${allDone?'style="text-decoration:line-through;color:var(--muted)"':''}>${st.name}</div>
+              <div class="ex-detail stretch-dur"><strong>${st.dur}</strong></div>
+            </div>
+            <div class="ex-actions">
+              ${timerBtn}
+              <button class="info-btn stretch-info ${isOpen?'open':''}" onclick="toggleExp('${expKey}')">?</button>
+              <button class="round-btn ${allDone?'done':''}" onclick="tapStretch('${stretchKey}',${totalSides})" title="Mark side done">
+                <div class="round-counter">${pips}</div>
+                <span>${sideLabel}</span>
+              </button>
+            </div>
+          </div>
+          <div class="ex-explainer stretch-exp ${isOpen?'open':''}">
+            <div class="explainer-section"><div class="explainer-label">How to do it</div><div class="explainer-text">${st.what}</div></div>
+            <div class="explainer-section"><div class="explainer-label why">Why after this session</div><div class="explainer-text">${st.why}</div></div>
+            <div class="explainer-section"><div class="explainer-label feel">What you should feel</div><div class="explainer-text">${st.feel}</div></div>
+          </div>
+        </div>`;
+    });
+    html += `</div>
+      <div class="stretch-tip">
+        <strong>Timing:</strong> Do these immediately post-workout while muscles are warm.<br>
+        <strong>Approach:</strong> Hold without bouncing. Breathe out and relax into it.
+      </div>`;
+  }
+
+  content.innerHTML = html;
+}
+
+// ─── SWAP EXERCISE ───────────────────────────────────────────────────────────
+let swapTarget = null; // {d, ei}
+let swapFilter = 'all';
+
+function openSwap(d, ei) {
+  const w = tracker.currentWeek;
+  const day = program.weeks[w-1].days[d];
+  const currentEx = day.exercises[ei];
+  swapTarget = {d, ei};
+  swapFilter = 'all';
+
+  document.getElementById('swap-replacing').textContent = `Replacing: ${currentEx.name}`;
+  document.getElementById('swap-modal').style.display = 'flex';
+
+  renderSwapFilters(currentEx);
+  renderSwapList(currentEx, day);
+}
+
+function closeSwap(e) {
+  if (e.target === document.getElementById('swap-modal')) closeSwapBtn();
+}
+function closeSwapBtn() {
+  document.getElementById('swap-modal').style.display = 'none';
+  swapTarget = null;
+}
+
+function renderSwapFilters(currentEx) {
+  const patterns = ['all','push','pull','hinge','squat','core','carry','mobility','power'];
+  const labels = {all:'All',push:'Push',pull:'Pull',hinge:'Hinge',squat:'Squat',core:'Core',carry:'Carry',mobility:'Mobility',power:'Power'};
+  document.getElementById('swap-filters').innerHTML = patterns.map(p =>
+    `<div class="filter-chip ${swapFilter===p?'active':''}" onclick="setSwapFilter('${p}')">${labels[p]}</div>`
+  ).join('');
+}
+
+function setSwapFilter(pattern) {
+  swapFilter = pattern;
+  const w = tracker.currentWeek;
+  const day = program.weeks[w-1].days[swapTarget.d];
+  const currentEx = day.exercises[swapTarget.ei];
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.toggle('active', c.textContent.toLowerCase() === pattern || (pattern==='all' && c.textContent==='All')));
+  renderSwapList(currentEx, day);
+}
+
+function renderSwapList(currentEx, day) {
+  const w = tracker.currentWeek;
+  const phase = program.weeks[w-1].phase;
+  const equipment = program.wiz.equipment;
+  const level = program.wiz.level;
+
+  // Filter library by equipment and pattern
+  const available = LIBRARY.filter(ex => {
+    if (swapFilter !== 'all' && ex.pattern !== swapFilter) return false;
+    if (!ex.equip || ex.equip.length === 0) return true;
+    return ex.equip.some(e => equipment.includes(e));
+  });
+
+  const list = document.getElementById('swap-list');
+  if (available.length === 0) {
+    list.innerHTML = `<div style="color:var(--muted);font-size:0.78rem;padding:20px 0;text-align:center;">No exercises available for this filter with your equipment.</div>`;
+    return;
+  }
+
+  list.innerHTML = available.map(ex => {
+    const isCurrent = ex.id === currentEx.id;
+    const formatted = formatExercise(ex, level, phase, w, program.totalWeeks, program.wiz.progression);
+    if (isCurrent) {
+      return `<div class="swap-option current">
+        <div class="swap-option-name">${ex.name} <span style="color:var(--muted);font-size:0.65rem">(current)</span></div>
+        <div class="swap-option-detail">${formatted.label} · ${ex.pattern}</div>
+      </div>`;
+    }
+    return `<div class="swap-option" onclick="selectSwapEx('${ex.id}', this)">
+      <div class="swap-option-name">${ex.name}</div>
+      <div class="swap-option-detail">${formatted.label} · ${ex.pattern}</div>
+      <div class="swap-scope" id="scope-${ex.id}" style="display:none;margin-top:10px;display:none;gap:8px;">
+        <button class="scope-btn" onclick="event.stopPropagation();confirmSwap('${ex.id}','this')">This week only</button>
+        <button class="scope-btn scope-all" onclick="event.stopPropagation();confirmSwap('${ex.id}','all')">All remaining weeks</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function selectSwapEx(exId, el) {
+  // Collapse any other open scope selectors
+  document.querySelectorAll('.swap-scope').forEach(s => s.style.display = 'none');
+  document.querySelectorAll('.swap-option').forEach(o => o.classList.remove('selected-swap'));
+  // Show this one's scope buttons
+  const scope = el.querySelector('.swap-scope');
+  if (scope) { scope.style.display = 'flex'; el.classList.add('selected-swap'); }
+}
+
+function confirmSwap(exId, scope) {
+  if (!swapTarget) return;
+  const {d, ei} = swapTarget;
+  const w = tracker.currentWeek;
+  const newEx = LIBRARY.find(e => e.id === exId);
+  if (!newEx) return;
+
+  if (scope === 'this') {
+    const weekDay = program.weeks[w-1].days[d];
+    if (weekDay && weekDay.type === 'workout' && weekDay.exercises[ei]) {
+      weekDay.exercises[ei] = formatExercise(newEx, program.wiz.level, program.weeks[w-1].phase, w, program.totalWeeks, program.wiz.progression);
+    }
+    tracker.checked[ck(w, d, ei)] = 0;
+  } else {
+    for (let ww = w; ww <= program.totalWeeks; ww++) {
+      const weekDay = program.weeks[ww-1].days[d];
+      if (weekDay && weekDay.type === 'workout' && weekDay.exercises[ei]) {
+        weekDay.exercises[ei] = formatExercise(newEx, program.wiz.level, program.weeks[ww-1].phase, ww, program.totalWeeks, program.wiz.progression);
+      }
+    }
+    tracker.checked[ck(w, d, ei)] = 0;
+  }
+
+  saveState();
+  closeSwapBtn();
+  renderDay();
+}
+
+function tapStretch(stretchKey, totalSides) {
+  const current = tracker.checked[stretchKey] || 0;
+  tracker.checked[stretchKey] = current >= totalSides ? 0 : current + 1;
+  saveState();
+  renderDay();
+}
+
+function startStretchTimer(secs, label, eachSide, stretchKey) {
+  // Store stretch context on the timer for auto-other-side
+  timerStretchCtx = { secs, label, eachSide, stretchKey, side: 1 };
+  const displayLabel = eachSide ? `${label} — Side 1` : label;
+  startTimer(secs, displayLabel);
+}
+
+// ─── TIMER ───────────────────────────────────────────────────────────────────
+let timerTotal=0,timerRemaining=0,timerInterval=null,timerRunning=false,timerName='';
+let preStartInterval=null,preStartCount=0;
+let timerStretchCtx = null; // {secs, label, eachSide, stretchKey, side}
+
+function parseDuration(text) {
+  const m = text.match(/(\d+)\s*sec/i);
+  return m ? parseInt(m[1]) : 0;
+}
+
+function speak(text) {
+  try {
+    const u = new SpeechSynthesisUtterance(text);
+    u.rate=1.0; u.pitch=1.0; u.volume=1.0;
+    const voices = window.speechSynthesis.getVoices();
+    const female = voices.find(v=>/samantha|karen|moira|tessa|fiona|victoria|allison|ava|susan|zoe|kate|amy|emma|lisa/i.test(v.name)) || null;
+    if (female) u.voice = female;
+    window.speechSynthesis.speak(u);
+  } catch(e){}
+}
+function speakCancel() { try { window.speechSynthesis.cancel(); } catch(e){} }
+
+function startTimer(seconds, label) {
+  clearInterval(timerInterval); clearInterval(preStartInterval); speakCancel();
+  timerTotal=seconds; timerRemaining=seconds; timerName=label; timerRunning=false;
+  document.getElementById('timer-label').textContent=label;
+  document.getElementById('timer-display').className='timer-display';
+  document.getElementById('timer-fill').style.width='0%';
+  document.getElementById('timer-playpause').textContent='⏸';
+  document.getElementById('timer-bar').classList.add('visible');
+  updateTimerDisplay(); beginPreStart();
+}
+function beginPreStart() {
+  preStartCount=3; speak(String(preStartCount));
+  document.getElementById('timer-label').textContent=`Get ready… ${preStartCount}`;
+  preStartInterval=setInterval(()=>{
+    preStartCount--;
+    if(preStartCount>0){speak(String(preStartCount));document.getElementById('timer-label').textContent=`Get ready… ${preStartCount}`;}
+    else{clearInterval(preStartInterval);speak('Go');document.getElementById('timer-label').textContent=timerName;timerRunning=true;timerInterval=setInterval(tickTimer,1000);}
+  },1300);
+}
+function tickTimer() {
+  timerRemaining--;updateTimerDisplay();
+  if(timerRemaining>0&&timerRemaining<=3) speak(String(timerRemaining));
+  else if(timerRemaining===0){
+    clearInterval(timerInterval);timerRunning=false;
+    document.getElementById('timer-playpause').textContent='▶';
+    if(navigator.vibrate) navigator.vibrate([200,100,200]);
+    // Auto-advance each-side stretches
+    if(timerStretchCtx && timerStretchCtx.eachSide && timerStretchCtx.side===1){
+      const ctx = timerStretchCtx;
+      // Mark side 1 done
+      if((tracker.checked[ctx.stretchKey]||0) < 1){
+        tracker.checked[ctx.stretchKey]=1; saveState(); renderDay();
+      }
+      timerStretchCtx={...ctx,side:2};
+      setTimeout(()=>{
+        speak('Other side');
+        startTimer(ctx.secs, `${ctx.label} — Side 2`);
+      },1500);
+    } else {
+      speak('Done');
+      if(timerStretchCtx){
+        const ctx=timerStretchCtx;
+        tracker.checked[ctx.stretchKey]=ctx.eachSide?2:1;
+        saveState(); renderDay(); timerStretchCtx=null;
+      }
+    }
+  }
+}
+function updateTimerDisplay() {
+  const m=Math.floor(timerRemaining/60),s=timerRemaining%60;
+  const display=document.getElementById('timer-display');
+  display.textContent=`${m}:${s.toString().padStart(2,'0')}`;
+  const pct=timerTotal>0?((timerTotal-timerRemaining)/timerTotal)*100:0;
+  document.getElementById('timer-fill').style.width=pct+'%';
+  if(timerRemaining<=5&&timerRemaining>0)display.className='timer-display warning';
+  else if(timerRemaining===0)display.className='timer-display done';
+  else display.className='timer-display';
+}
+function timerPlayPause() {
+  if(preStartCount>0){clearInterval(preStartInterval);speakCancel();preStartCount=0;document.getElementById('timer-label').textContent=timerName;document.getElementById('timer-playpause').textContent='▶';return;}
+  if(timerRemaining===0){timerReset();return;}
+  if(timerRunning){clearInterval(timerInterval);timerRunning=false;document.getElementById('timer-playpause').textContent='▶';}
+  else{timerRunning=true;document.getElementById('timer-playpause').textContent='⏸';timerInterval=setInterval(tickTimer,1000);}
+}
+function timerReset() {
+  clearInterval(timerInterval);clearInterval(preStartInterval);speakCancel();
+  preStartCount=0;timerRunning=false;timerRemaining=timerTotal;timerStretchCtx=null;
+  document.getElementById('timer-display').className='timer-display';
+  document.getElementById('timer-fill').style.width='0%';
+  document.getElementById('timer-playpause').textContent='⏸';
+  updateTimerDisplay();beginPreStart();
+}
+function timerClose() {
+  clearInterval(timerInterval);clearInterval(preStartInterval);speakCancel();
+  preStartCount=0;timerRunning=false;timerStretchCtx=null;
+  document.getElementById('timer-bar').classList.remove('visible');
+}
+
+// ─── BOOT ────────────────────────────────────────────────────────────────────
+if(window.speechSynthesis){window.speechSynthesis.getVoices();window.speechSynthesis.onvoiceschanged=()=>window.speechSynthesis.getVoices();}
+init();
+</script>
+</body>
+</html>
