@@ -1937,6 +1937,11 @@ function renderDay() {
       <div class="section-tab ${sec==='workout'?'active-workout':''}" onclick="switchSection('workout')">⚡ Workout</div>
       <div class="section-tab ${sec==='stretch'?'active-stretch':''}" onclick="switchSection('stretch')">🧘 Cooldown</div>
     </div>`;
+  html += `<div class="day-status-bar">
+    <button class="day-status-btn ${dayStatus==='skip'?'active-skip':''}" onclick="setDayStatus('skip')">⏭ Skip</button>
+    <button class="day-status-btn ${dayStatus==='cardio'?'active-cardio':''}" onclick="setDayStatus('cardio')">🏃 Cardio</button>
+    <button class="day-status-btn ${dayStatus==='rest'?'active-rest':''}" onclick="setDayStatus('rest')">😴 Rest</button>
+  </div>`;
 
   if (dayStatus === 'skip') {
     html += `<div class="day-skipped-msg">⏭ You skipped this session. That's okay — rest is part of training.</div>`;
@@ -2070,7 +2075,10 @@ let swapFilter = 'all';
 function openSwap(d, ei) {
   const w = tracker.currentWeek;
   const day = program.weeks[w-1].days[d];
-  const currentEx = day.exercises[ei];
+  // Get live formatted exercise (exercises are computed dynamically)
+  const liveExercises = getLiveExercises(day, w, d);
+  const currentEx = liveExercises[ei];
+  if (!currentEx) return;
   swapTarget = {d, ei};
   swapFilter = 'all';
 
@@ -2477,6 +2485,37 @@ function applyReview() {
 
 // ─── BOOT ────────────────────────────────────────────────────────────────────
 if(window.speechSynthesis){window.speechSynthesis.getVoices();window.speechSynthesis.onvoiceschanged=()=>window.speechSynthesis.getVoices();}
+
+// Check for quick workout launch params
+(function checkQuickMode() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('quick') !== '1') return;
+  const focus = params.get('focus') || 'full';
+  const mins = parseInt(params.get('mins')) || 15;
+  // Build a single-week quick program and launch straight into it
+  const sessionCfg = {10:{rounds:2,exCount:4},15:{rounds:3,exCount:4},20:{rounds:3,exCount:5},30:{rounds:4,exCount:6}}[mins] || {rounds:3,exCount:4};
+  const exIds = selectExerciseIds(focus, ['bw','kb_light','kb_heavy','bar','bench'], 'intermediate', sessionCfg.exCount);
+  const focusLabels = {full:'Full Body',push:'Upper Push',core:'Core & Carry',hinge:'Lower Body',mobility:'Mobility',pull:'Pull & Back'};
+  program = {
+    totalWeeks: 1,
+    phases: [{startWeek:1,endWeek:1,name:'Quick Workout',cls:'phase-1',bannerCls:'p1',desc:`<strong>Quick ${focusLabels[focus]} · ${mins} min</strong>`}],
+    wiz: {weeks:1,days:[1],sessionMins:mins,equipment:['bw','kb_light','kb_heavy','bar','bench'],dayFocus:{1:focus},level:'intermediate',cooldown:'yes',progression:'fixed'},
+    weeks: [{
+      weekNum:1,
+      phase:{startWeek:1,endWeek:1,name:'Quick',cls:'phase-1',bannerCls:'p1',desc:'',progressionLevel:0},
+      days:[
+        {type:'rest',dayName:'Mon'},
+        {type:'workout',dayName:'Tue',focus,focusLabel:focusLabels[focus],baseRounds:sessionCfg.rounds,exerciseIds:exIds,stretches:STRETCHES[focus]||STRETCHES.full},
+        {type:'rest',dayName:'Wed'},{type:'rest',dayName:'Thu'},{type:'rest',dayName:'Fri'},{type:'rest',dayName:'Sat'},{type:'rest',dayName:'Sun'}
+      ]
+    }]
+  };
+  tracker = ensureTrackerShape({currentWeek:1,currentDayTab:1,checked:{},sections:{}});
+  // Remove URL params without reload
+  history.replaceState(null,'',window.location.pathname);
+  showTracker();
+})();
+
 init();
 </script>
 </body>

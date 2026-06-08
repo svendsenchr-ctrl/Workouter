@@ -421,6 +421,77 @@ body {
 }
 
 /* ── FOOTER ── */
+/* Quick workout */
+.quick-card {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.quick-card-inner {
+  padding: 16px 18px;
+}
+.quick-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.2rem;
+  letter-spacing: 0.05em;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.quick-sub {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+.quick-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.quick-opt {
+  padding: 10px 12px;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: left;
+}
+.quick-opt:hover { border-color: var(--accent); background: #fff5f2; }
+.quick-opt.selected { border-color: var(--accent); background: #fff5f2; }
+.quick-opt-name {
+  font-weight: 600;
+  font-size: 0.82rem;
+  color: var(--ink);
+  margin-bottom: 2px;
+}
+.quick-opt.selected .quick-opt-name { color: var(--accent); }
+.quick-opt-detail { font-size: 0.68rem; color: var(--muted); line-height: 1.3; }
+.quick-go-btn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  background: var(--ink);
+  color: #fff;
+  text-align: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 0.1em;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.quick-go-btn:hover { background: var(--accent); }
+.quick-go-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
 footer {
   padding: 20px;
   border-top: 1px solid var(--border);
@@ -468,6 +539,55 @@ footer {
   <!-- PROGRAM SUMMARY -->
   <div class="section-label">Your Program</div>
   <div id="program-section"></div>
+
+  <!-- QUICK WORKOUT -->
+  <div class="section-label">Quick Workout</div>
+  <div class="quick-card">
+    <div class="quick-card-inner">
+      <div class="quick-title">Just want to move?</div>
+      <div class="quick-sub">Pick a focus and duration — the app will jump straight into a session without a saved program.</div>
+      <div class="quick-options" id="quick-options">
+        <button class="quick-opt" data-focus="full" onclick="selectQuick(this)">
+          <div class="quick-opt-name">Full Body</div>
+          <div class="quick-opt-detail">Push + hinge + core</div>
+        </button>
+        <button class="quick-opt" data-focus="push" onclick="selectQuick(this)">
+          <div class="quick-opt-name">Upper Push</div>
+          <div class="quick-opt-detail">Chest, shoulders, triceps</div>
+        </button>
+        <button class="quick-opt" data-focus="core" onclick="selectQuick(this)">
+          <div class="quick-opt-name">Core & Carry</div>
+          <div class="quick-opt-detail">Anti-flexion + lateral</div>
+        </button>
+        <button class="quick-opt" data-focus="hinge" onclick="selectQuick(this)">
+          <div class="quick-opt-name">Lower Body</div>
+          <div class="quick-opt-detail">Hinge + glutes</div>
+        </button>
+        <button class="quick-opt" data-focus="mobility" onclick="selectQuick(this)">
+          <div class="quick-opt-name">Mobility</div>
+          <div class="quick-opt-detail">Movement + stretching</div>
+        </button>
+        <button class="quick-opt" data-focus="pull" onclick="selectQuick(this)">
+          <div class="quick-opt-name">Pull & Back</div>
+          <div class="quick-opt-detail">Rows + posterior chain</div>
+        </button>
+      </div>
+      <div class="quick-options" style="grid-template-columns:1fr 1fr 1fr;margin-bottom:14px" id="quick-time">
+        <button class="quick-opt" data-mins="10" onclick="selectQuickTime(this)">
+          <div class="quick-opt-name">10 min</div>
+        </button>
+        <button class="quick-opt selected" data-mins="15" onclick="selectQuickTime(this)">
+          <div class="quick-opt-name">15 min</div>
+        </button>
+        <button class="quick-opt" data-mins="20" onclick="selectQuickTime(this)">
+          <div class="quick-opt-name">20 min</div>
+        </button>
+      </div>
+      <button class="quick-go-btn" id="quick-go-btn" disabled onclick="launchQuickWorkout()">
+        Pick a focus above →
+      </button>
+    </div>
+  </div>
 
   <!-- SHARE -->
   <div class="section-label">Share</div>
@@ -714,6 +834,46 @@ function copyLink() {
 }
 
 init();
+
+// ─── QUICK WORKOUT ────────────────────────────────────────────────────────────
+let quickFocus = null;
+let quickMins = 15;
+
+function selectQuick(el) {
+  document.querySelectorAll('#quick-options .quick-opt').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  quickFocus = el.dataset.focus;
+  updateQuickBtn();
+}
+
+function selectQuickTime(el) {
+  document.querySelectorAll('#quick-time .quick-opt').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  quickMins = parseInt(el.dataset.mins);
+  updateQuickBtn();
+}
+
+function updateQuickBtn() {
+  const btn = document.getElementById('quick-go-btn');
+  if (quickFocus) {
+    btn.disabled = false;
+    const focusLabels = {
+      full:'Full Body', push:'Upper Push', core:'Core & Carry',
+      hinge:'Lower Body', mobility:'Mobility', pull:'Pull & Back'
+    };
+    btn.textContent = `Start ${focusLabels[quickFocus]} · ${quickMins} min →`;
+  } else {
+    btn.disabled = true;
+    btn.textContent = 'Pick a focus above →';
+  }
+}
+
+function launchQuickWorkout() {
+  if (!quickFocus) return;
+  // Pass params to app via URL — app detects and launches quick mode
+  const url = `home-workout-builder.html?quick=1&focus=${quickFocus}&mins=${quickMins}`;
+  window.location.href = url;
+}
 </script>
 </body>
 </html>
