@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home Workout</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f4f0;
+  --ink: #111110;
+  --accent: #ff3d00;
+  --accent2: #ff8c00;
+  --surface: #ffffff;
+  --border: #e0dfd9;
+  --muted: #888884;
+  --green: #1a8a4a;
+  --blue: #1a5fa8;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 400;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── HERO ── */
+.hero {
+  background: var(--ink);
+  padding: 48px 20px 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 40px,
+    rgba(255,61,0,0.04) 40px,
+    rgba(255,61,0,0.04) 41px
+  );
+}
+
+.hero-inner { position: relative; z-index: 1; }
+
+.hero-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.hero-label::before {
+  content: '';
+  width: 24px;
+  height: 2px;
+  background: var(--accent);
+  display: inline-block;
+}
+
+.hero-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(3.2rem, 12vw, 5rem);
+  letter-spacing: 0.04em;
+  line-height: 0.92;
+  color: #fff;
+  margin-bottom: 16px;
+}
+.hero-title .accent { color: var(--accent); }
+
+.hero-sub {
+  font-size: 0.88rem;
+  color: rgba(255,255,255,0.5);
+  line-height: 1.6;
+  max-width: 320px;
+  margin-bottom: 28px;
+}
+
+.hero-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--accent);
+  color: #fff;
+  text-decoration: none;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.2rem;
+  letter-spacing: 0.1em;
+  padding: 14px 28px;
+  border-radius: 4px;
+  transition: background 0.15s, transform 0.15s;
+}
+.hero-cta:hover { background: #e03000; transform: translateY(-1px); }
+.hero-cta .arrow { font-size: 1rem; transition: transform 0.15s; }
+.hero-cta:hover .arrow { transform: translateX(3px); }
+
+.version-badge {
+  display: inline-block;
+  margin-top: 16px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+}
+.version-badge span { color: rgba(255,255,255,0.6); }
+
+/* ── UPDATE BANNER ── */
+.update-banner {
+  background: #fff8e6;
+  border-bottom: 2px solid #ffd980;
+  padding: 12px 20px;
+  display: none;
+  align-items: center;
+  gap: 12px;
+}
+.update-banner.visible { display: flex; }
+.update-icon { font-size: 1.1rem; flex-shrink: 0; }
+.update-text { flex: 1; font-size: 0.78rem; color: #8a6000; line-height: 1.5; }
+.update-text strong { font-weight: 600; display: block; margin-bottom: 2px; }
+.update-dismiss {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #c87800;
+  background: none;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 4px 0;
+}
+
+/* ── CONTENT ── */
+.content { padding: 0 20px 60px; }
+
+/* ── PROGRAM CARD ── */
+.section-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 28px 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.program-card {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.program-card-header {
+  background: var(--ink);
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.program-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.3rem;
+  letter-spacing: 0.06em;
+  color: #fff;
+}
+.program-phase {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.7);
+}
+
+.program-card-body { padding: 16px 18px; }
+
+.program-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.stat { text-align: center; }
+.stat-val {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2rem;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  line-height: 1;
+}
+.stat-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 3px;
+}
+
+.program-progress-wrap {
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.program-progress-bar {
+  flex: 1;
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.program-progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 3px;
+  transition: width 0.8s ease;
+}
+.program-progress-pct {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  min-width: 36px;
+  text-align: right;
+}
+
+.program-days {
+  display: flex;
+  gap: 4px;
+  margin-top: 14px;
+}
+.program-day {
+  flex: 1;
+  padding: 6px 2px;
+  text-align: center;
+  border-radius: 5px;
+  border: 1.5px solid var(--border);
+  background: var(--bg);
+}
+.program-day .pd-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  display: block;
+}
+.program-day .pd-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--border);
+  margin: 4px auto 0;
+}
+.program-day.done .pd-dot { background: var(--green); }
+.program-day.rest { opacity: 0.4; }
+
+.open-app-btn {
+  display: block;
+  width: 100%;
+  margin-top: 14px;
+  padding: 13px;
+  background: var(--accent);
+  color: #fff;
+  text-align: center;
+  text-decoration: none;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 0.1em;
+  border-radius: 8px;
+  transition: background 0.15s;
+}
+.open-app-btn:hover { background: #e03000; }
+
+.no-program-card {
+  background: var(--surface);
+  border: 2px dashed var(--border);
+  border-radius: 12px;
+  padding: 28px 20px;
+  text-align: center;
+}
+.no-program-icon { font-size: 2rem; margin-bottom: 10px; }
+.no-program-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.3rem;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.no-program-sub { font-size: 0.78rem; color: var(--muted); line-height: 1.5; margin-bottom: 18px; }
+.start-btn {
+  display: inline-block;
+  padding: 12px 28px;
+  background: var(--accent);
+  color: #fff;
+  text-decoration: none;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 0.1em;
+  border-radius: 8px;
+}
+
+/* ── SHARE CARD ── */
+.share-card {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.share-icon {
+  width: 44px; height: 44px;
+  border-radius: 10px;
+  background: #fff5f2;
+  border: 2px solid #ffcca0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+.share-text { flex: 1; }
+.share-title { font-weight: 600; font-size: 0.88rem; margin-bottom: 2px; }
+.share-sub { font-size: 0.72rem; color: var(--muted); line-height: 1.4; }
+.share-copy-btn {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: #fff5f2;
+  border: 1.5px solid #ffcca0;
+  padding: 7px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.share-copy-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+.share-copy-btn.copied { background: var(--green); color: #fff; border-color: var(--green); }
+
+/* ── CHANGELOG ── */
+.changelog { }
+.changelog-entry {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 8px;
+}
+.changelog-entry:first-child { border-color: var(--accent); }
+.changelog-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.changelog-version {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+}
+.changelog-date {
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: var(--muted);
+  flex: 1;
+}
+.changelog-tag {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 10px;
+}
+.tag-latest { background: #fff5f2; color: var(--accent); border: 1px solid #ffcca0; }
+.tag-stable { background: #f0faf5; color: var(--green); border: 1px solid #80d0a0; }
+.changelog-items {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.changelog-item {
+  font-size: 0.78rem;
+  color: #555;
+  line-height: 1.5;
+  display: flex;
+  gap: 8px;
+}
+.changelog-item::before {
+  content: '—';
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+/* ── FOOTER ── */
+footer {
+  padding: 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.footer-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+.footer-logo span { color: var(--accent); }
+.footer-note { font-size: 0.68rem; color: var(--muted); text-align: right; line-height: 1.4; }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-inner">
+    <div class="hero-label">Built for results</div>
+    <h1 class="hero-title">Home<br><span class="accent">Workout</span></h1>
+    <p class="hero-sub">A custom strength program that gets harder every week. Bodyweight + kettlebells. 10–30 minutes a day.</p>
+    <a href="app.html" class="hero-cta">Open App <span class="arrow">→</span></a>
+    <div class="version-badge">Version <span id="current-version-display">—</span></div>
+  </div>
+</div>
+
+<!-- UPDATE BANNER -->
+<div class="update-banner" id="update-banner">
+  <div class="update-icon">⚡</div>
+  <div class="update-text">
+    <strong>App updated</strong>
+    <span id="update-note">New features available. Open the app to see what's changed.</span>
+  </div>
+  <button class="update-dismiss" onclick="dismissUpdate()">Got it</button>
+</div>
+
+<div class="content">
+
+  <!-- PROGRAM SUMMARY -->
+  <div class="section-label">Your Program</div>
+  <div id="program-section"></div>
+
+  <!-- SHARE -->
+  <div class="section-label">Share</div>
+  <div class="share-card">
+    <div class="share-icon">🔗</div>
+    <div class="share-text">
+      <div class="share-title">Invite a training buddy</div>
+      <div class="share-sub">Send them this link. They get their own independent program tracked in their browser.</div>
+    </div>
+    <button class="share-copy-btn" id="share-btn" onclick="copyLink()">Copy Link</button>
+  </div>
+
+  <!-- CHANGELOG -->
+  <div class="section-label">What's New</div>
+  <div class="changelog" id="changelog"></div>
+
+</div>
+
+<footer>
+  <div class="footer-logo">Home <span>Workout</span></div>
+  <div class="footer-note">Progress saves in your browser.<br>Each person has their own data.</div>
+</footer>
+
+<script>
+// ─── VERSION REGISTRY ─────────────────────────────────────────────────────────
+// Add a new entry here every time you ship an update.
+// The LATEST entry (first in the array) is the current version.
+// 'breaking' = true means saved programs may need rebuilding.
+
+const VERSIONS = [
+  {
+    version: '2.0',
+    date: 'June 2026',
+    tag: 'latest',
+    breaking: false,
+    changes: [
+      'Per-day progression — adjust movement complexity, rounds, and reps independently each week',
+      'Week review prompt — triggers automatically when a week is complete',
+      'Exercises computed live per week — progression is now visible week to week',
+      'Single rep targets replace ranges — clear goal each session',
+      'Numbered step-by-step guides for all exercises and stretches',
+      'Stretch progress tracking with auto-other-side timer',
+      'Richer stretch descriptions explaining the physiology',
+      'Version migration system — updates no longer break saved programs',
+    ]
+  },
+  {
+    version: '1.5',
+    date: 'May 2026',
+    tag: 'stable',
+    breaking: false,
+    changes: [
+      'Round counter per exercise — tap after each round, pips fill as you go',
+      'Exercise swap — replace any exercise this week or all remaining weeks',
+      'Edit program mid-run without losing progress',
+      'Spoken timer countdown (3, 2, 1, Go) with auto-other-side for stretches',
+      'New design — Bebas Neue typography, orange-red palette',
+    ]
+  },
+  {
+    version: '1.0',
+    date: 'April 2026',
+    tag: 'stable',
+    breaking: false,
+    changes: [
+      'Initial release — 8-step program builder wizard',
+      'Weekly auto-progression with phase system',
+      'Exercise library with form cues and explanations',
+      'Cooldown stretches matched to each day focus',
+      'Timer with spoken countdown',
+      'localStorage save — progress persists across sessions',
+    ]
+  },
+];
+
+const CURRENT_VERSION = VERSIONS[0].version;
+const LS_SPLASH_KEY = 'homeWorkout_splash';
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+function init() {
+  document.getElementById('current-version-display').textContent = CURRENT_VERSION;
+
+  const splashState = getSplashState();
+
+  // Show update banner if version changed
+  if (splashState.lastSeenVersion && splashState.lastSeenVersion !== CURRENT_VERSION) {
+    const banner = document.getElementById('update-banner');
+    const entry = VERSIONS[0];
+    const note = entry.breaking
+      ? 'Breaking changes in this update — you may need to rebuild your program.'
+      : `Version ${CURRENT_VERSION} is live with ${entry.changes.length} improvements.`;
+    document.getElementById('update-note').textContent = note;
+    banner.classList.add('visible');
+  }
+
+  // Update last seen version
+  saveSplashState({ ...splashState, lastSeenVersion: CURRENT_VERSION });
+
+  renderProgramSection(splashState);
+  renderChangelog();
+}
+
+function getSplashState() {
+  try {
+    return JSON.parse(localStorage.getItem(LS_SPLASH_KEY) || '{}');
+  } catch(e) { return {}; }
+}
+
+function saveSplashState(state) {
+  try { localStorage.setItem(LS_SPLASH_KEY, JSON.stringify(state)); } catch(e) {}
+}
+
+function dismissUpdate() {
+  document.getElementById('update-banner').classList.remove('visible');
+}
+
+// ─── PROGRAM SECTION ──────────────────────────────────────────────────────────
+function renderProgramSection() {
+  const section = document.getElementById('program-section');
+  let saved = null;
+
+  try {
+    const raw = localStorage.getItem('homeWorkoutBuilder');
+    if (raw) saved = JSON.parse(raw);
+  } catch(e) {}
+
+  if (!saved || !saved.program || !saved.tracker) {
+    section.innerHTML = `
+      <div class="no-program-card">
+        <div class="no-program-icon">💪</div>
+        <div class="no-program-title">No program yet</div>
+        <div class="no-program-sub">Answer 8 quick questions and get a custom program built for your equipment, schedule, and level.</div>
+        <a href="app.html" class="start-btn">Build My Program →</a>
+      </div>`;
+    return;
+  }
+
+  const { program, tracker } = saved;
+  const currentWeek = tracker.currentWeek || 1;
+  const totalWeeks = program.totalWeeks || 1;
+  const phase = (program.phases || []).find(p => currentWeek >= p.startWeek && currentWeek <= p.endWeek);
+  const phaseName = phase ? phase.name : 'In Progress';
+
+  // Calculate overall completion %
+  let totalPips = 0, filledPips = 0;
+  for (let w = 1; w <= currentWeek; w++) {
+    const weekData = program.weeks[w-1];
+    if (!weekData) continue;
+    weekData.days.forEach((day, d) => {
+      if (day.type !== 'workout') return;
+      const exCount = day.exerciseIds ? day.exerciseIds.length : (day.exercises || []).length;
+      const rounds = day.rounds || day.baseRounds || 3;
+      totalPips += exCount * rounds;
+      for (let ei = 0; ei < exCount; ei++) {
+        const key = `${w}-${d}-${ei}`;
+        filledPips += Math.min(tracker.checked[key] || 0, rounds);
+      }
+    });
+  }
+  const pct = totalPips > 0 ? Math.round((filledPips / totalPips) * 100) : 0;
+
+  // Days of week summary for current week
+  const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const weekData = program.weeks[currentWeek-1];
+  const dayDots = weekData ? DAYS.map((name, d) => {
+    const day = weekData.days[d];
+    if (!day || day.type === 'rest') return `<div class="program-day rest"><span class="pd-name">${name}</span><div class="pd-dot"></div></div>`;
+    const exCount = day.exerciseIds ? day.exerciseIds.length : (day.exercises||[]).length;
+    const rounds = day.rounds || day.baseRounds || 3;
+    const filled = Array.from({length:exCount},(_,ei)=>ei).reduce((s,ei)=>s+Math.min(tracker.checked[`${currentWeek}-${d}-${ei}`]||0,rounds),0);
+    const done = filled >= exCount * rounds && exCount > 0;
+    return `<div class="program-day ${done?'done':''}"><span class="pd-name">${name}</span><div class="pd-dot"></div></div>`;
+  }).join('') : '';
+
+  // Level and days info
+  const level = program.wiz?.level || 'intermediate';
+  const daysPerWeek = (program.wiz?.days || []).length;
+
+  section.innerHTML = `
+    <div class="program-card">
+      <div class="program-card-header">
+        <div class="program-name">Week ${currentWeek} of ${totalWeeks}</div>
+        <div class="program-phase">${phaseName}</div>
+      </div>
+      <div class="program-card-body">
+        <div class="program-stats">
+          <div class="stat">
+            <div class="stat-val">${currentWeek}</div>
+            <div class="stat-label">Current week</div>
+          </div>
+          <div class="stat">
+            <div class="stat-val">${daysPerWeek}</div>
+            <div class="stat-label">Days / week</div>
+          </div>
+          <div class="stat">
+            <div class="stat-val">${program.wiz?.sessionMins || '—'}</div>
+            <div class="stat-label">Min / session</div>
+          </div>
+        </div>
+        <div class="program-progress-wrap">
+          <div class="program-progress-bar">
+            <div class="program-progress-fill" style="width:${pct}%"></div>
+          </div>
+          <div class="program-progress-pct">${pct}%</div>
+        </div>
+        <div class="program-days">${dayDots}</div>
+        <a href="app.html" class="open-app-btn">Continue Training →</a>
+      </div>
+    </div>`;
+}
+
+// ─── CHANGELOG ────────────────────────────────────────────────────────────────
+function renderChangelog() {
+  const el = document.getElementById('changelog');
+  el.innerHTML = VERSIONS.map((v, i) => `
+    <div class="changelog-entry">
+      <div class="changelog-top">
+        <div class="changelog-version">v${v.version}</div>
+        <div class="changelog-date">${v.date}</div>
+        <div class="changelog-tag ${i===0?'tag-latest':'tag-stable'}">${i===0?'Latest':'Stable'}</div>
+      </div>
+      <ul class="changelog-items">
+        ${v.changes.map(c=>`<li class="changelog-item">${c}</li>`).join('')}
+      </ul>
+    </div>
+  `).join('');
+}
+
+// ─── SHARE ────────────────────────────────────────────────────────────────────
+function copyLink() {
+  const url = window.location.href.split('?')[0].replace(/\/$/, '');
+  const btn = document.getElementById('share-btn');
+  navigator.clipboard.writeText(url).then(() => {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copy Link';
+      btn.classList.remove('copied');
+    }, 2000);
+  }).catch(() => {
+    // Fallback for older browsers
+    prompt('Copy this link:', url);
+  });
+}
+
+init();
+</script>
+</body>
+</html>
