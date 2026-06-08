@@ -2779,7 +2779,20 @@ function applyReview() {
 // ─── BOOT ────────────────────────────────────────────────────────────────────
 if(window.speechSynthesis){window.speechSynthesis.getVoices();window.speechSynthesis.onvoiceschanged=()=>window.speechSynthesis.getVoices();}
 
-// Check for quick workout launch params
+// Check for preset launch
+(function checkPresetMode() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('preset') !== '1') return;
+  history.replaceState(null,'',window.location.pathname);
+  try {
+    const savedWiz = JSON.parse(localStorage.getItem('homeWorkout_presetWiz') || 'null');
+    if (!savedWiz) return;
+    localStorage.removeItem('homeWorkout_presetWiz');
+    // Apply preset wiz and build immediately
+    wiz = { ...wiz, ...savedWiz };
+    buildProgram();
+  } catch(e) {}
+})();
 (function checkQuickMode() {
   const params = new URLSearchParams(window.location.search);
   if (params.get('quick') !== '1') { init(); return; }

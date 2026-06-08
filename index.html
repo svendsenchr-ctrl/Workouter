@@ -732,8 +732,8 @@ function renderEntryCards() {
         </div>
         <div class="entry-card-sub">${hasProg ? 'Continue your custom program where you left off.' : 'Build a custom program tailored to your schedule, equipment, and level.'}</div>
         ${hasProg ? programCardHtml : ''}
-        <a href="home-workout-builder.html" class="entry-card-btn ${hasProg?'primary':'secondary'}">${hasProg?'Continue →':'Build My Program →'}</a>
-        ${hasProg ? `&nbsp;<a href="home-workout-builder.html" class="entry-card-btn secondary" style="margin-left:6px">Edit</a>` : ''}
+        <a href="${hasProg?'home-workout-builder.html':'build-program.html'}" class="entry-card-btn ${hasProg?'primary':'secondary'}">${hasProg?'Continue →':'Build My Program →'}</a>
+        ${hasProg ? `&nbsp;<a href="build-program.html" class="entry-card-btn secondary" style="margin-left:6px">New Program</a>` : ''}
       </div>
     </div>
     <div class="entry-card">
