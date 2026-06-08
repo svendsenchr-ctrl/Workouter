@@ -1361,6 +1361,7 @@ function init() {
       // Validate basic structure before using
       if (isValidSave(saved)) {
         program = saved.program;
+        if (program.wiz) program.wiz = normaliseWizDays(program.wiz);
         tracker = ensureTrackerShape(saved.tracker);
         saveState(); // write back with updated version
         showTracker();
@@ -1389,6 +1390,20 @@ function isValidSave(saved) {
       typeof saved.tracker.checked === 'object'
     );
   } catch(e) { return false; }
+}
+
+function normaliseWizDays(w) {
+  // JSON parse turns object keys to strings — normalise dayFocus to int keys
+  // and ensure days array contains integers
+  if (w && w.dayFocus) {
+    const fixed = {};
+    Object.keys(w.dayFocus).forEach(k => { fixed[parseInt(k)] = w.dayFocus[k]; });
+    w.dayFocus = fixed;
+  }
+  if (w && w.days) {
+    w.days = w.days.map(d => parseInt(d));
+  }
+  return w;
 }
 
 function ensureTrackerShape(t) {
@@ -1663,7 +1678,7 @@ function buildProgram() {
     const weekDays = [];
     for (let d = 0; d < 7; d++) {
       if (wiz.days.includes(d)) {
-        const focus = wiz.dayFocus[d] || 'full';
+        const focus = wiz.dayFocus[d] || wiz.dayFocus[String(d)] || 'full';
         // Store only exercise IDs — formatting happens dynamically at render time
         const exerciseIds = selectExerciseIds(focus, wiz.equipment, wiz.level, sessionCfg.exCount);
         weekDays.push({
@@ -2823,7 +2838,7 @@ function applyReview() {
       if (!program.wiz.days.includes(d)) continue;
       const weekDay = program.weeks[ww-1].days[d];
       if (!weekDay || weekDay.type !== 'workout') continue;
-      const focus = program.wiz.dayFocus[d] || 'full';
+      const focus = program.wiz.dayFocus[d] || program.wiz.dayFocus[String(d)] || 'full';
       weekDay.exerciseIds = selectExerciseIds(focus, program.wiz.equipment, program.wiz.level, sessionCfg.exCount);
       weekDay.baseRounds = sessionCfg.rounds;
       // Preserve stretches — only rebuild exercise IDs
@@ -2853,7 +2868,7 @@ let presetHandled = false;
     const savedWiz = JSON.parse(localStorage.getItem('homeWorkout_presetWiz') || 'null');
     if (!savedWiz) return;
     localStorage.removeItem('homeWorkout_presetWiz');
-    wiz = { ...wiz, ...savedWiz };
+    wiz = normaliseWizDays({ ...wiz, ...savedWiz });
     buildProgram();
     presetHandled = true;
   } catch(e) { console.error('Preset error:', e); }
