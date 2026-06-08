@@ -1552,7 +1552,8 @@ function showTracker() {
   if (debugEl && program) {
     const w0 = program.weeks && program.weeks[0];
     const workoutDays = w0 ? w0.days.filter(d=>d.type==='workout') : [];
-    debugEl.innerHTML = `totalWeeks:${program.totalWeeks} | wiz.days:${JSON.stringify(program.wiz?.days)} | week0 days:${w0?.days?.length} | workout days:${workoutDays.length} | exIds0:${JSON.stringify(workoutDays[0]?.exerciseIds?.slice(0,2))}`;
+    const currentDay = w0 && w0.days[tracker.currentDayTab];
+    debugEl.innerHTML = `totalWeeks:${program.totalWeeks} | wiz.days:${JSON.stringify(program.wiz?.days)} | week0 days:${w0?.days?.length} | workout days:${workoutDays.length} | exIds0:${JSON.stringify(workoutDays[0]?.exerciseIds?.slice(0,2))} | currentDayTab:${tracker.currentDayTab} | currentDay.type:${currentDay?.type} | currentDay.focus:${currentDay?.focus}`;
   }
   renderTracker();
 }
