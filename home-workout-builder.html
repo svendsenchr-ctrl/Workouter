@@ -241,6 +241,16 @@ header{background:var(--ink);padding:14px 16px;display:flex;align-items:center;j
 .scope-btn.scope-all{border-color:var(--accent);color:var(--accent);background:#fff5f2;}
 .scope-btn.scope-all:hover{background:#ffe8e0;}
 
+/* Day status */
+.day-status-bar{display:flex;gap:6px;margin:12px 0 0;}
+.day-status-btn{flex:1;padding:9px 6px;border-radius:8px;border:2px solid var(--border);background:var(--surface2);font-size:0.68rem;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:var(--muted);cursor:pointer;text-align:center;transition:all 0.15s;line-height:1.3;}
+.day-status-btn:hover{border-color:var(--muted);color:var(--ink);}
+.day-status-btn.active-skip{border-color:#e05a2b;background:#fff3ee;color:#c04000;}
+.day-status-btn.active-cardio{border-color:var(--blue);background:#f0f5ff;color:var(--blue);}
+.day-status-btn.active-rest{border-color:var(--muted);background:#f5f5f5;color:var(--muted);}
+.day-skipped-msg{margin:14px 0 0;padding:14px 16px;border-radius:8px;border:2px solid #ffd0c0;background:#fff3ee;font-size:0.82rem;color:#c04000;font-weight:500;text-align:center;}
+.day-alt-msg{margin:14px 0 0;padding:14px 16px;border-radius:8px;border:2px solid #b0ccf0;background:#f0f5ff;font-size:0.82rem;color:var(--blue);font-weight:500;text-align:center;}
+
 /* Week review modal */
 .review-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:300;display:flex;align-items:flex-end;}
 .review-sheet{background:var(--surface);border-radius:16px 16px 0 0;width:100%;max-height:90vh;display:flex;flex-direction:column;border-top:3px solid var(--green);}
@@ -434,12 +444,12 @@ header{background:var(--ink);padding:14px 16px;display:flex;align-items:center;j
     <!-- STEP 8: Progression -->
     <div class="wizard-step" id="step-8">
       <div class="step-label">Step 8 of 8</div>
-      <div class="step-title">Auto <span>progression?</span></div>
+      <div class="step-title">How should it <span>progress?</span></div>
       <div class="step-sub">Progression means the program gets harder each week — more rounds, higher reps, longer holds, and harder exercise variants.</div>
       <div class="option-grid">
         <div class="opt-card" data-val="auto" onclick="selectOpt(this,'progression')">
           <div class="opt-title">Auto-progression</div>
-          <div class="opt-sub">Reps, holds, and rounds increase week by week. Exercise variants step up at 60% of the program. Recommended.</div>
+          <div class="opt-sub">Reps, holds, and rounds increase automatically every week. Variants step up mid-program. Adjust each week via the review prompt.</div>
         </div>
         <div class="opt-card" data-val="fixed" onclick="selectOpt(this,'progression')">
           <div class="opt-title">Fixed difficulty</div>
@@ -1033,6 +1043,7 @@ let tracker = {
   // Per-day progression offsets — keyed by dayIndex
   // Each: { movementLevel: 0-2, roundsOffset: 0-3, repOffset: 0-6 }
   dayProgress: {},
+  dayStatus: {}, // key: 'w-d' => 'done'|'skip'|'cardio'|'rest'|null
 };
 let openExp = {};
 
@@ -1101,6 +1112,7 @@ function ensureTrackerShape(t) {
   if (!t.checked) t.checked = {};
   if (!t.sections) t.sections = {};
   if (!t.dayProgress) t.dayProgress = {};
+  if (!t.dayStatus) t.dayStatus = {};
   if (typeof t.currentWeek !== 'number') t.currentWeek = 1;
   if (typeof t.currentDayTab !== 'number') t.currentDayTab = 0;
   return t;
@@ -1340,7 +1352,7 @@ function buildProgram() {
   const totalWeeks = wiz.weeks;
   // If fixed or manual, use single flat phase
   let phases;
-  if (wiz.progression === 'fixed' || wiz.progression === 'manual') {
+  if (!isDynamic(wiz.progression)) {
     phases = [{
       startWeek:1, endWeek:totalWeeks,
       name: wiz.progression === 'fixed' ? 'Fixed Program' : 'Your Program',
@@ -1498,6 +1510,10 @@ function pickFromPool(pool, level, phase, n) {
 }
 
 // ─── PROGRESSION ENGINE ──────────────────────────────────────────────────────
+function isDynamic(progression) {
+  return progression === 'auto' || progression === 'dynamic';
+}
+
 // dayProg: { movementLevel:0-2, roundsOffset:0-3, repOffset:0-6 }
 // weekNum/totalWeeks drive the base auto-progression curve
 // dayProg overrides/adds on top of that curve
@@ -1510,7 +1526,7 @@ function getDayProgress(dayIndex) {
 function weekProgression(weekNum, totalWeeks, progression, dayProg) {
   const dp = dayProg || { movementLevel:0, roundsOffset:0, repOffset:0 };
 
-  if (progression !== 'auto') {
+  if (!isDynamic(progression)) {
     // Fixed: only user-driven offsets apply
     return {
       roundsAdd: dp.roundsOffset,
@@ -1736,7 +1752,7 @@ function renderWeekGrid() {
   // Show live progression info for the current day
   const currentDay = program.weeks[tracker.currentWeek-1]?.days[tracker.currentDayTab];
   let progressNote = '';
-  if (program.wiz.progression === 'auto' && currentDay && currentDay.type === 'workout') {
+  if ((isDynamic(program.wiz.progression)) && currentDay && currentDay.type === 'workout') {
     const liveRnds = getLiveRounds(currentDay, tracker.currentWeek, tracker.currentDayTab);
     const dayProg = getDayProgress(tracker.currentDayTab);
     const prog = weekProgression(tracker.currentWeek, program.totalWeeks, program.wiz.progression, dayProg);
@@ -1774,8 +1790,10 @@ function renderDayTabs() {
     const liveRounds = !isRest && day.type==='workout' ? getLiveRounds(day, tracker.currentWeek, d) : 0;
     const liveExCount = !isRest && day.type==='workout' ? (day.exerciseIds ? day.exerciseIds.length : (day.exercises||[]).length) : 0;
     const done = !isRest && day.type === 'workout' && liveExCount > 0 && Array.from({length:liveExCount},(_,ei)=>ei).every(ei => getRounds(tracker.currentWeek,d,ei) >= liveRounds);
+    const status = getDayStatus(tracker.currentWeek, d);
+    const statusMark = status === 'skip' ? '⏭' : status === 'cardio' ? '🏃' : status === 'rest' ? '😴' : '';
     return `<div class="tab ${isActive?'active':''} ${isRest?'rest-tab':''} ${done?'done':''}" 
-      onclick="selectDayTab(${d})">${day.dayName}</div>`;
+      onclick="selectDayTab(${d})">${day.dayName}${statusMark?`<span style="font-size:0.5rem;display:block">${statusMark}</span>`:''}</div>`;
   }).join('');
 }
 
@@ -1810,6 +1828,9 @@ function isWeekDone(w) {
   for (let d = 0; d < 7; d++) {
     const day = weekData.days[d];
     if (!day || day.type !== 'workout') continue;
+    // Skipped/alt days count as acknowledged
+    const status = getDayStatus(w, d);
+    if (status === 'skip' || status === 'cardio' || status === 'rest') continue;
     const exCount = day.exerciseIds ? day.exerciseIds.length : (day.exercises||[]).length;
     const hasAny = Array.from({length:exCount},(_,ei)=>ei).some(ei => getRounds(w,d,ei) > 0);
     if (!hasAny) return false;
@@ -1838,13 +1859,21 @@ function toggleExp(key) {
 }
 
 // Get live formatted exercises for a day (always computed fresh)
-function getLiveExercises(day, w, d) {
-  if (!day.exerciseIds) {
-    // Legacy: day already has formatted exercises stored
-    return day.exercises || [];
+// Get the dayProgress applicable for a given week
+// Past weeks use a frozen snapshot if one exists
+function getDayProgressForWeek(dayIndex, w) {
+  if (!tracker.weekSnapshots) tracker.weekSnapshots = {};
+  if (w < tracker.currentWeek && tracker.weekSnapshots[w]) {
+    return tracker.weekSnapshots[w][dayIndex] || { movementLevel:0, roundsOffset:0, repOffset:0 };
   }
+  return getDayProgress(dayIndex);
+}
+
+// Get live formatted exercises for a day (always computed fresh)
+function getLiveExercises(day, w, d) {
+  if (!day.exerciseIds) return day.exercises || [];
   const phase = program.weeks[w-1].phase;
-  const dayProg = getDayProgress(d);
+  const dayProg = getDayProgressForWeek(d, w);
   return day.exerciseIds.map(id => {
     const ex = LIBRARY.find(e => e.id === id);
     if (!ex) return null;
@@ -1854,11 +1883,12 @@ function getLiveExercises(day, w, d) {
 
 // Get live rounds for a day
 function getLiveRounds(day, w, d) {
-  if (!day.exerciseIds) return day.rounds || 3; // legacy
-  const dayProg = getDayProgress(d);
+  if (!day.exerciseIds) return day.rounds || day.baseRounds || 3;
+  const dayProg = getDayProgressForWeek(d, w);
   const prog = weekProgression(w, program.totalWeeks, program.wiz.progression, dayProg);
   return prog.isTest ? 2 : Math.min(Math.max(day.baseRounds + prog.roundsAdd, 1), 5);
 }
+
 
 function renderDay() {
   const w = tracker.currentWeek;
@@ -1891,6 +1921,7 @@ function renderDay() {
   const doneCount = exercises.filter((_,ei) => getRounds(w,d,ei) >= totalRounds).length;
   const pct = totalPips > 0 ? Math.round((filledPips / totalPips) * 100) : 0;
   const sec = getSection(w,d);
+  const dayStatus = getDayStatus(w, d);
   const roundsNote = `${totalRounds} rounds · ${program.wiz.sessionMins} min session`;
 
   let html = `
@@ -1904,6 +1935,21 @@ function renderDay() {
       <div class="section-tab ${sec==='stretch'?'active-stretch':''}" onclick="switchSection('stretch')">🧘 Cooldown</div>
     </div>`;
 
+  if (dayStatus === 'skip') {
+    html += `<div class="day-skipped-msg">⏭ You skipped this session. That's okay — rest is part of training.</div>`;
+    content.innerHTML = html;
+    return;
+  }
+  if (dayStatus === 'cardio') {
+    html += `<div class="day-alt-msg">🏃 Logged as cardio. Your strength program picks up tomorrow.</div>`;
+    content.innerHTML = html;
+    return;
+  }
+  if (dayStatus === 'rest') {
+    html += `<div class="day-alt-msg" style="border-color:#c0c0c0;background:#f5f5f5;color:var(--muted)">😴 Rest day — recovery is part of the program.</div>`;
+    content.innerHTML = html;
+    return;
+  }
   if (sec === 'workout') {
     html += `
       <div class="progress-bar-wrap">
@@ -2247,6 +2293,23 @@ function timerClose() {
   document.getElementById('timer-bar').classList.remove('visible');
 }
 
+// ─── DAY STATUS ──────────────────────────────────────────────────────────────
+function dayStatusKey(w, d) { return `ds-${w}-${d}`; }
+function getDayStatus(w, d) { return tracker.dayStatus && tracker.dayStatus[dayStatusKey(w,d)] || null; }
+
+function setDayStatus(status) {
+  const w = tracker.currentWeek;
+  const d = tracker.currentDayTab;
+  const key = dayStatusKey(w, d);
+  const current = getDayStatus(w, d);
+  // Toggle off if clicking the same status
+  tracker.dayStatus[key] = current === status ? null : status;
+  saveState();
+  renderDayTabs();
+  renderDay();
+  renderWeekGrid();
+}
+
 // ─── WEEK REVIEW ─────────────────────────────────────────────────────────────
 let reviewDraft = {}; // {dayIndex: {movementLevel, roundsOffset, repOffset}}
 
@@ -2278,6 +2341,11 @@ function checkWeekComplete() {
 
 function openReview(w) {
   tracker.reviewedWeek = w;
+  // Snapshot the dayProgress at the point this week completed
+  if (!tracker.weekSnapshots) tracker.weekSnapshots = {};
+  if (!tracker.weekSnapshots[w]) {
+    tracker.weekSnapshots[w] = JSON.parse(JSON.stringify(tracker.dayProgress || {}));
+  }
   saveState();
 
   // Init draft from current dayProgress
@@ -2377,24 +2445,23 @@ function applyReview() {
     tracker.dayProgress[d] = { ...reviewDraft[d] };
   });
 
-  // Rebuild all remaining weeks with new dayProgress
+  // Snapshot current dayProgress so completed weeks stay frozen
   const w = tracker.currentWeek;
+  if (!tracker.weekSnapshots) tracker.weekSnapshots = {};
+  tracker.weekSnapshots[w] = JSON.parse(JSON.stringify(tracker.dayProgress));
+
+  // Rebuild remaining weeks (w+1 onwards) — completed weeks untouched
   const totalWeeks = program.totalWeeks;
   const sessionCfg = {10:{rounds:2,exCount:4},15:{rounds:3,exCount:4},20:{rounds:3,exCount:5},30:{rounds:4,exCount:6}}[program.wiz.sessionMins] || {rounds:3,exCount:4};
 
   for (let ww = w + 1; ww <= totalWeeks; ww++) {
-    const phase = program.phases.find(p => ww >= p.startWeek && ww <= p.endWeek);
     for (let d = 0; d < 7; d++) {
       if (!program.wiz.days.includes(d)) continue;
       const weekDay = program.weeks[ww-1].days[d];
       if (!weekDay || weekDay.type !== 'workout') continue;
-
       const focus = program.wiz.dayFocus[d] || 'full';
-      const dayProg = tracker.dayProgress[d] || { movementLevel:0, roundsOffset:0, repOffset:0 };
-      // Just update the stored IDs (formatting happens live at render time)
       weekDay.exerciseIds = selectExerciseIds(focus, program.wiz.equipment, program.wiz.level, sessionCfg.exCount);
       weekDay.baseRounds = sessionCfg.rounds;
-      // Remove legacy exercises field if present
       delete weekDay.exercises;
       delete weekDay.rounds;
     }
