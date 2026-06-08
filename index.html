@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home Workout</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f4f0;
+  --ink: #111110;
+  --accent: #ff3d00;
+  --accent2: #ff8c00;
+  --surface: #ffffff;
+  --border: #e0dfd9;
+  --muted: #888884;
+  --green: #1a8a4a;
+  --blue: #1a5fa8;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 400;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── HERO ── */
+.hero {
+  background: var(--ink);
+  padding: 48px 20px 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 40px,
+    rgba(255,61,0,0.04) 40px,
+    rgba(255,61,0,0.04) 41px
+  );
+}
+
+.hero-inner { position: relative; z-index: 1; }
+
+.hero-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.hero-label::before {
+  content: '';
+  width: 24px;
+  height: 2px;
+  background: var(--accent);
+  display: inline-block;
+}
+
+.hero-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(3.2rem, 12vw, 5rem);
+  letter-spacing: 0.04em;
+  line-height: 0.92;
+  color: #fff;
+  margin-bottom: 16px;
+}
+.hero-title .accent { color: var(--accent); }
+
+.hero-sub {
+  font-size: 0.88rem;
+  color: rgba(255,255,255,0.5);
+  line-height: 1.6;
+  max-width: 320px;
+  margin-bottom: 28px;
+}
+
+.hero-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--accent);
+  color: #fff;
+  text-decoration: none;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.2rem;
+  letter-spacing: 0.1em;
+  padding: 14px 28px;
+  border-radius: 4px;
+  transition: background 0.15s, transform 0.15s;
+}
+.hero-cta:hover { background: #e03000; transform: translateY(-1px); }
+.hero-cta .arrow { font-size: 1rem; transition: transform 0.15s; }
+.hero-cta:hover .arrow { transform: translateX(3px); }
+
+.version-badge {
+  display: inline-block;
+  margin-top: 16px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+}
+.version-badge span { color: rgba(255,255,255,0.6); }
+
+/* ── UPDATE BANNER ── */
+.update-banner {
+  background: #fff8e6;
+  border-bottom: 2px solid #ffd980;
+  padding: 12px 20px;
+  display: none;
+  align-items: center;
+  gap: 12px;
+}
+.update-banner.visible { display: flex; }
+.update-icon { font-size: 1.1rem; flex-shrink: 0; }
+.update-text { flex: 1; font-size: 0.78rem; color: #8a6000; line-height: 1.5; }
+.update-text strong { font-weight: 600; display: block; margin-bottom: 2px; }
+.update-dismiss {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #c87800;
+  background: none;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 4px 0;
+}
+
+/* ── CONTENT ── */
+.content { padding: 0 20px 60px; }
+
+/* ── PROGRAM CARD ── */
+.section-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 28px 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.program-card {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.program-card-header {
+  background: var(--ink);
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.program-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.3rem;
+  letter-spacing: 0.06em;
+  color: #fff;
+}
+.program-phase {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.7);
+}
+
+.program-card-body { padding: 16px 18px; }
+
+.program-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.stat { text-align: center; }
+.stat-val {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2rem;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  line-height: 1;
+}
+.stat-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 3px;
+}
+
+.program-progress-wrap {
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.program-progress-bar {
+  flex: 1;
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.program-progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 3px;
+  transition: width 0.8s ease;
+}
+.program-progress-pct {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  min-width: 36px;
+  text-align: right;
+}
+
+.program-days {
+  display: flex;
+  gap: 4px;
+  margin-top: 14px;
+}
+.program-day {
+  flex: 1;
+  padding: 6px 2px;
+  text-align: center;
+  border-radius: 5px;
+  border: 1.5px solid var(--border);
+  background: var(--bg);
+}
+.program-day .pd-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  display: block;
+}
+.program-day .pd-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--border);
+  margin: 4px auto 0;
+}
+.program-day.done .pd-dot { background: var(--green); }
+.program-day.rest { opacity: 0.4; }
+
+.open-app-btn {
+  display: block;
+  width: 100%;
+  margin-top: 14px;
+  padding: 13px;
+  background: var(--accent);
+  color: #fff;
+  text-align: center;
+  text-decoration: none;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 0.1em;
+  border-radius: 8px;
+  transition: background 0.15s;
+}
+.open-app-btn:hover { background: #e03000; }
+
+.no-program-card {
+  background: var(--surface);
+  border: 2px dashed var(--border);
+  border-radius: 12px;
+  padding: 28px 20px;
+  text-align: center;
+}
+.no-program-icon { font-size: 2rem; margin-bottom: 10px; }
+.no-program-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.3rem;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.no-program-sub { font-size: 0.78rem; color: var(--muted); line-height: 1.5; margin-bottom: 18px; }
+.start-btn {
+  display: inline-block;
+  padding: 12px 28px;
+  background: var(--accent);
+  color: #fff;
+  text-decoration: none;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 0.1em;
+  border-radius: 8px;
+}
+
+/* ── SHARE CARD ── */
+.share-card {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.share-icon {
+  width: 44px; height: 44px;
+  border-radius: 10px;
+  background: #fff5f2;
+  border: 2px solid #ffcca0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+.share-text { flex: 1; }
+.share-title { font-weight: 600; font-size: 0.88rem; margin-bottom: 2px; }
+.share-sub { font-size: 0.72rem; color: var(--muted); line-height: 1.4; }
+.share-copy-btn {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: #fff5f2;
+  border: 1.5px solid #ffcca0;
+  padding: 7px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.share-copy-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+.share-copy-btn.copied { background: var(--green); color: #fff; border-color: var(--green); }
+
+/* ── CHANGELOG ── */
+.changelog { }
+.changelog-entry {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 8px;
+}
+.changelog-entry:first-child { border-color: var(--accent); }
+.changelog-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.changelog-version {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+}
+.changelog-date {
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: var(--muted);
+  flex: 1;
+}
+.changelog-tag {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 10px;
+}
+.tag-latest { background: #fff5f2; color: var(--accent); border: 1px solid #ffcca0; }
+.tag-stable { background: #f0faf5; color: var(--green); border: 1px solid #80d0a0; }
+.changelog-items {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.changelog-item {
+  font-size: 0.78rem;
+  color: #555;
+  line-height: 1.5;
+  display: flex;
+  gap: 8px;
+}
+.changelog-item::before {
+  content: '—';
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+/* ── FOOTER ── */
+/* Quick workout */
+.quick-card {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.quick-card-inner {
+  padding: 16px 18px;
+}
+.quick-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.2rem;
+  letter-spacing: 0.05em;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.quick-sub {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+.quick-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.quick-opt {
+  padding: 10px 12px;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: left;
+}
+.quick-opt:hover { border-color: var(--accent); background: #fff5f2; }
+.quick-opt.selected { border-color: var(--accent); background: #fff5f2; }
+.quick-opt-name {
+  font-weight: 600;
+  font-size: 0.82rem;
+  color: var(--ink);
+  margin-bottom: 2px;
+}
+.quick-opt.selected .quick-opt-name { color: var(--accent); }
+.quick-opt-detail { font-size: 0.68rem; color: var(--muted); line-height: 1.3; }
+.quick-go-btn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  background: var(--ink);
+  color: #fff;
+  text-align: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 0.1em;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.quick-go-btn:hover { background: var(--accent); }
+.quick-go-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+.entry-cards{display:flex;flex-direction:column;gap:10px;}
+.entry-card{background:var(--surface);border:2px solid var(--border);border-radius:12px;overflow:hidden;text-decoration:none;display:block;transition:border-color 0.15s;}
+.entry-card:hover{border-color:var(--accent);}
+.entry-card-inner{padding:18px;}
+.entry-card-top{display:flex;align-items:center;gap:12px;margin-bottom:6px;}
+.entry-card-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+.entry-card-icon.program{background:#fff5f2;border:2px solid #ffcca0;}
+.entry-card-icon.build{background:#f0faf5;border:2px solid #80d0a0;}
+.entry-card-icon.quick{background:#f5f0ff;border:2px solid #c0a0ff;}
+.entry-card-title{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:0.04em;color:var(--ink);}
+.entry-card-sub{font-size:0.75rem;color:var(--muted);line-height:1.5;margin-bottom:12px;}
+.entry-card-btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:6px;font-family:'Bebas Neue',sans-serif;font-size:0.9rem;letter-spacing:0.08em;transition:all 0.15s;}
+.entry-card-btn.primary{background:var(--accent);color:#fff;}
+.entry-card-btn.primary:hover{background:#e03000;}
+.entry-card-btn.secondary{background:var(--green);color:#fff;}
+.entry-card-btn.secondary:hover{background:#167a3e;}
+.entry-card-btn.tertiary{background:#6a3fa8;color:#fff;}
+.entry-card-btn.tertiary:hover{background:#5a2f98;}
+
+/* Program mini summary inside card */
+.program-mini{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);}
+.program-mini-stats{display:flex;gap:16px;margin-bottom:10px;}
+.pm-stat-val{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:0.04em;color:var(--accent);line-height:1;}
+.pm-stat-label{font-size:0.62rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-top:2px;}
+.pm-days{display:flex;gap:3px;margin-bottom:10px;}
+.pm-day{flex:1;padding:5px 2px;text-align:center;border-radius:4px;border:1.5px solid var(--border);background:var(--bg);}
+.pm-day .pd-name{font-family:'Bebas Neue',sans-serif;font-size:0.68rem;letter-spacing:0.04em;color:var(--muted);display:block;}
+.pm-day .pd-dot{width:5px;height:5px;border-radius:50%;background:var(--border);margin:3px auto 0;}
+.pm-day.done .pd-dot{background:var(--green);}
+.pm-day.rest{opacity:0.35;}
+.pm-progress-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:4px;}
+.pm-progress-fill{height:100%;background:var(--accent);border-radius:2px;}
+
+footer {
+  padding: 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.footer-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+.footer-logo span { color: var(--accent); }
+.footer-note { font-size: 0.68rem; color: var(--muted); text-align: right; line-height: 1.4; }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-inner">
+    <div class="hero-label">Built for results</div>
+    <h1 class="hero-title">Home<br><span class="accent">Workout</span></h1>
+    <p class="hero-sub">A custom strength program that gets harder every week. Bodyweight + kettlebells. 10–30 minutes a day.</p>
+    <div class="version-badge" style="margin-top:0">Version <span id="current-version-display">—</span></div>
+  </div>
+</div>
+
+<!-- UPDATE BANNER -->
+<div class="update-banner" id="update-banner">
+  <div class="update-icon">⚡</div>
+  <div class="update-text">
+    <strong>App updated</strong>
+    <span id="update-note">New features available. Open the app to see what's changed.</span>
+  </div>
+  <button class="update-dismiss" onclick="dismissUpdate()">Got it</button>
+</div>
+
+<div class="content">
+
+  <!-- THREE ENTRY POINTS -->
+  <div class="section-label">Where to</div>
+  <div id="entry-cards"></div>
+
+  <!-- PROGRAM SUMMARY (shown inside entry-cards dynamically) -->
+  <div id="program-section" style="display:none"></div>
+
+    <!-- SHARE -->
+  <div class="section-label">Share</div>
+  <div class="share-card">
+    <div class="share-icon">🔗</div>
+    <div class="share-text">
+      <div class="share-title">Invite a training buddy</div>
+      <div class="share-sub">Send them this link. They get their own independent program tracked in their browser.</div>
+    </div>
+    <button class="share-copy-btn" id="share-btn" onclick="copyLink()">Copy Link</button>
+  </div>
+
+  <!-- CHANGELOG -->
+  <div class="section-label">What's New</div>
+  <div class="changelog" id="changelog"></div>
+
+</div>
+
+<footer>
+  <div class="footer-logo">Home <span>Workout</span></div>
+  <div class="footer-note">Progress saves in your browser.<br>Each person has their own data.</div>
+</footer>
+
+<script>
+// ─── VERSION REGISTRY ─────────────────────────────────────────────────────────
+// Add a new entry here every time you ship an update.
+// The LATEST entry (first in the array) is the current version.
+// 'breaking' = true means saved programs may need rebuilding.
+
+const VERSIONS = [
+  {
+    version: '0.1',
+    date: 'June 2026',
+    tag: 'latest',
+    breaking: false,
+    changes: [
+      'Program builder — 8-step wizard covering weeks, days, session length, equipment, focus per day, level, cooldown, and progression',
+      '54-exercise library across push, pull, hinge, squat, core, carry, mobility, and power',
+      'Dynamic Progression — reps, holds, and rounds increase automatically each week with variant step-ups mid-program',
+      'Per-day progression review after each completed week — adjust movement complexity, rounds, and reps independently per day',
+      'Round counter per exercise — tap after each round, pips fill as you go',
+      'Numbered step-by-step form guides for every exercise and stretch',
+      'Cooldown stretches matched to each day\'s focus with auto-other-side timer',
+      'Exercise swap — replace any exercise for this week or all remaining weeks',
+      'Skip, cardio, and rest day logging per session',
+      'Spoken countdown timer — 3, 2, 1, Go and end countdown',
+      'Quick Workout — standalone session with no program setup required',
+      'Progress saves in your browser — each person has their own independent data',
+      'Version migration system — future updates won\'t break saved programs',
+    ]
+  },
+];
+
+const CURRENT_VERSION = '0.1';
+const LS_SPLASH_KEY = 'homeWorkout_splash';
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+function init() {
+  document.getElementById('current-version-display').textContent = CURRENT_VERSION;
+
+  const splashState = getSplashState();
+
+  // Show update banner if version changed
+  if (splashState.lastSeenVersion && splashState.lastSeenVersion !== CURRENT_VERSION) {
+    const banner = document.getElementById('update-banner');
+    const entry = VERSIONS[0];
+    const note = entry.breaking
+      ? 'Breaking changes in this update — you may need to rebuild your program.'
+      : `Version ${CURRENT_VERSION} is live with ${entry.changes.length} improvements.`;
+    document.getElementById('update-note').textContent = note;
+    banner.classList.add('visible');
+  }
+
+  // Update last seen version
+  saveSplashState({ ...splashState, lastSeenVersion: CURRENT_VERSION });
+
+  renderEntryCards();
+  renderChangelog();
+}
+
+function getSplashState() {
+  try {
+    return JSON.parse(localStorage.getItem(LS_SPLASH_KEY) || '{}');
+  } catch(e) { return {}; }
+}
+
+function saveSplashState(state) {
+  try { localStorage.setItem(LS_SPLASH_KEY, JSON.stringify(state)); } catch(e) {}
+}
+
+function dismissUpdate() {
+  document.getElementById('update-banner').classList.remove('visible');
+}
+
+// ─── PROGRAM SECTION ──────────────────────────────────────────────────────────
+function renderEntryCards() {
+  let savedProgram = null;
+  try {
+    const raw = localStorage.getItem('homeWorkoutBuilder');
+    if (raw) savedProgram = JSON.parse(raw);
+  } catch(e) {}
+
+  const hasProg = savedProgram && savedProgram.program && savedProgram.tracker;
+  const cards = document.getElementById('entry-cards');
+
+  let programCardHtml = '';
+  if (hasProg) {
+    const { program, tracker } = savedProgram;
+    const currentWeek = tracker.currentWeek || 1;
+    const totalWeeks = program.totalWeeks || 1;
+    const phase = (program.phases||[]).find(p => currentWeek >= p.startWeek && currentWeek <= p.endWeek);
+    const daysPerWeek = (program.wiz?.days||[]).length;
+
+    let totalPips=0,filledPips=0;
+    for(let w=1;w<=currentWeek;w++){
+      const wd=program.weeks[w-1];if(!wd)continue;
+      wd.days.forEach((day,d)=>{
+        if(day.type!=='workout')return;
+        const ec=day.exerciseIds?day.exerciseIds.length:(day.exercises||[]).length;
+        const rds=day.rounds||day.baseRounds||3;
+        totalPips+=ec*rds;
+        for(let ei=0;ei<ec;ei++){filledPips+=Math.min(tracker.checked[`${w}-${d}-${ei}`]||0,rds);}
+      });
+    }
+    const pct=totalPips>0?Math.round((filledPips/totalPips)*100):0;
+    const DAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    const wd=program.weeks[currentWeek-1];
+    const dayDots=wd?DAYS.map((name,d)=>{
+      const day=wd.days[d];
+      if(!day||day.type==='rest')return `<div class="pm-day rest"><span class="pd-name">${name}</span><div class="pd-dot"></div></div>`;
+      const ec=day.exerciseIds?day.exerciseIds.length:(day.exercises||[]).length;
+      const rds=day.rounds||day.baseRounds||3;
+      const filled=Array.from({length:ec},(_,ei)=>ei).reduce((s,ei)=>s+Math.min(tracker.checked[`${currentWeek}-${d}-${ei}`]||0,rds),0);
+      const done=filled>=ec*rds&&ec>0;
+      return `<div class="pm-day ${done?'done':''}"><span class="pd-name">${name}</span><div class="pd-dot"></div></div>`;
+    }).join(''):'';
+
+    programCardHtml = `
+      <div class="program-mini">
+        <div class="program-mini-stats">
+          <div><div class="pm-stat-val">${currentWeek}/${totalWeeks}</div><div class="pm-stat-label">Week</div></div>
+          <div><div class="pm-stat-val">${daysPerWeek}</div><div class="pm-stat-label">Days/wk</div></div>
+          <div><div class="pm-stat-val">${pct}%</div><div class="pm-stat-label">Done</div></div>
+        </div>
+        <div class="pm-days">${dayDots}</div>
+        <div class="pm-progress-bar"><div class="pm-progress-fill" style="width:${pct}%"></div></div>
+      </div>`;
+  }
+
+  cards.innerHTML = `
+    <div class="entry-card">
+      <div class="entry-card-inner">
+        <div class="entry-card-top">
+          <div class="entry-card-icon program">📋</div>
+          <div class="entry-card-title">${hasProg ? 'Your Program' : 'No Program Yet'}</div>
+        </div>
+        <div class="entry-card-sub">${hasProg ? 'Continue your custom program where you left off.' : 'Build a custom program tailored to your schedule, equipment, and level.'}</div>
+        ${hasProg ? programCardHtml : ''}
+        <a href="${hasProg?'home-workout-builder.html':'build-program.html'}" class="entry-card-btn ${hasProg?'primary':'secondary'}">${hasProg?'Continue →':'Build My Program →'}</a>
+        ${hasProg ? `&nbsp;<a href="build-program.html" class="entry-card-btn secondary" style="margin-left:6px">New Program</a>` : ''}
+      </div>
+    </div>
+    <div class="entry-card">
+      <div class="entry-card-inner">
+        <div class="entry-card-top">
+          <div class="entry-card-icon quick">⚡</div>
+          <div class="entry-card-title">Quick Workout</div>
+        </div>
+        <div class="entry-card-sub">Pick a focus and duration — jump straight into a session with no setup. Doesn't affect your saved program.</div>
+        <a href="quick-workout.html" class="entry-card-btn tertiary">Start Quick Workout →</a>
+      </div>
+    </div>`;
+}
+
+function renderProgramSection() {
+  const section = document.getElementById('program-section');
+  let saved = null;
+
+  try {
+    const raw = localStorage.getItem('homeWorkoutBuilder');
+    if (raw) saved = JSON.parse(raw);
+  } catch(e) {}
+
+  if (!saved || !saved.program || !saved.tracker) {
+    section.innerHTML = `
+      <div class="no-program-card">
+        <div class="no-program-icon">💪</div>
+        <div class="no-program-title">No program yet</div>
+        <div class="no-program-sub">Answer 8 quick questions and get a custom program built for your equipment, schedule, and level.</div>
+        <a href="home-workout-builder.html" class="start-btn">Build My Program →</a>
+      </div>`;
+    return;
+  }
+
+  const { program, tracker } = saved;
+  const currentWeek = tracker.currentWeek || 1;
+  const totalWeeks = program.totalWeeks || 1;
+  const phase = (program.phases || []).find(p => currentWeek >= p.startWeek && currentWeek <= p.endWeek);
+  const phaseName = phase ? phase.name : 'In Progress';
+
+  // Calculate overall completion %
+  let totalPips = 0, filledPips = 0;
+  for (let w = 1; w <= currentWeek; w++) {
+    const weekData = program.weeks[w-1];
+    if (!weekData) continue;
+    weekData.days.forEach((day, d) => {
+      if (day.type !== 'workout') return;
+      const exCount = day.exerciseIds ? day.exerciseIds.length : (day.exercises || []).length;
+      const rounds = day.rounds || day.baseRounds || 3;
+      totalPips += exCount * rounds;
+      for (let ei = 0; ei < exCount; ei++) {
+        const key = `${w}-${d}-${ei}`;
+        filledPips += Math.min(tracker.checked[key] || 0, rounds);
+      }
+    });
+  }
+  const pct = totalPips > 0 ? Math.round((filledPips / totalPips) * 100) : 0;
+
+  // Days of week summary for current week
+  const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const weekData = program.weeks[currentWeek-1];
+  const dayDots = weekData ? DAYS.map((name, d) => {
+    const day = weekData.days[d];
+    if (!day || day.type === 'rest') return `<div class="program-day rest"><span class="pd-name">${name}</span><div class="pd-dot"></div></div>`;
+    const exCount = day.exerciseIds ? day.exerciseIds.length : (day.exercises||[]).length;
+    const rounds = day.rounds || day.baseRounds || 3;
+    const filled = Array.from({length:exCount},(_,ei)=>ei).reduce((s,ei)=>s+Math.min(tracker.checked[`${currentWeek}-${d}-${ei}`]||0,rounds),0);
+    const done = filled >= exCount * rounds && exCount > 0;
+    return `<div class="program-day ${done?'done':''}"><span class="pd-name">${name}</span><div class="pd-dot"></div></div>`;
+  }).join('') : '';
+
+  // Level and days info
+  const level = program.wiz?.level || 'intermediate';
+  const daysPerWeek = (program.wiz?.days || []).length;
+
+  section.innerHTML = `
+    <div class="program-card">
+      <div class="program-card-header">
+        <div class="program-name">Week ${currentWeek} of ${totalWeeks}</div>
+        <div class="program-phase">${phaseName}</div>
+      </div>
+      <div class="program-card-body">
+        <div class="program-stats">
+          <div class="stat">
+            <div class="stat-val">${currentWeek}</div>
+            <div class="stat-label">Current week</div>
+          </div>
+          <div class="stat">
+            <div class="stat-val">${daysPerWeek}</div>
+            <div class="stat-label">Days / week</div>
+          </div>
+          <div class="stat">
+            <div class="stat-val">${program.wiz?.sessionMins || '—'}</div>
+            <div class="stat-label">Min / session</div>
+          </div>
+        </div>
+        <div class="program-progress-wrap">
+          <div class="program-progress-bar">
+            <div class="program-progress-fill" style="width:${pct}%"></div>
+          </div>
+          <div class="program-progress-pct">${pct}%</div>
+        </div>
+        <div class="program-days">${dayDots}</div>
+        <a href="home-workout-builder.html" class="open-app-btn">Continue Training →</a>
+      </div>
+    </div>`;
+}
+
+// ─── CHANGELOG ────────────────────────────────────────────────────────────────
+function renderChangelog() {
+  const el = document.getElementById('changelog');
+  el.innerHTML = VERSIONS.map((v, i) => `
+    <div class="changelog-entry">
+      <div class="changelog-top">
+        <div class="changelog-version">v${v.version}</div>
+        <div class="changelog-date">${v.date}</div>
+        <div class="changelog-tag ${i===0?'tag-latest':'tag-stable'}">${i===0?'Latest':'Stable'}</div>
+      </div>
+      <ul class="changelog-items">
+        ${v.changes.map(c=>`<li class="changelog-item">${c}</li>`).join('')}
+      </ul>
+    </div>
+  `).join('');
+}
+
+// ─── SHARE ────────────────────────────────────────────────────────────────────
+function copyLink() {
+  const url = window.location.href.split('?')[0].replace(/\/$/, '');
+  const btn = document.getElementById('share-btn');
+  navigator.clipboard.writeText(url).then(() => {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copy Link';
+      btn.classList.remove('copied');
+    }, 2000);
+  }).catch(() => {
+    // Fallback for older browsers
+    prompt('Copy this link:', url);
+  });
+}
+
+init();
+
+// ─── QUICK WORKOUT ────────────────────────────────────────────────────────────
+let quickFocus = null;
+let quickMins = 15;
+
+function selectQuick(el) {
+  document.querySelectorAll('#quick-options .quick-opt').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  quickFocus = el.dataset.focus;
+  updateQuickBtn();
+}
+
+function selectQuickTime(el) {
+  document.querySelectorAll('#quick-time .quick-opt').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  quickMins = parseInt(el.dataset.mins);
+  updateQuickBtn();
+}
+
+function updateQuickBtn() {
+  const btn = document.getElementById('quick-go-btn');
+  if (quickFocus) {
+    btn.disabled = false;
+    const focusLabels = {
+      full:'Full Body', push:'Upper Push', core:'Core & Carry',
+      hinge:'Lower Body', mobility:'Mobility', pull:'Pull & Back'
+    };
+    btn.textContent = `Start ${focusLabels[quickFocus]} · ${quickMins} min →`;
+  } else {
+    btn.disabled = true;
+    btn.textContent = 'Pick a focus above →';
+  }
+}
+
+function launchQuickWorkout() {
+  if (!quickFocus) return;
+  // Pass params to app via URL — app detects and launches quick mode
+  const url = `home-workout-builder.html?quick=1&focus=${quickFocus}&mins=${quickMins}`;
+  window.location.href = url;
+}
+</script>
+</body>
+</html>
