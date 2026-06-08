@@ -1921,9 +1921,8 @@ function selectExerciseIds(focus, equipment, level, count) {
   );
   const allowedPool = available.filter(e => patterns.includes(e.pattern));
   const picked = [], usedIds = new Set();
-  // Sort pool: beginner gets simpler variants first, advanced gets complex first
-  const levelOrder = ['beginner','intermediate','advanced'];
-  const levelIdx = levelOrder.indexOf(level || 'intermediate');
+
+  // Sort pool: prefer exercises that have a variant matching the level
   const sortedPool = [...allowedPool].sort((a, b) => {
     const aHasLevel = a.variants && a.variants.some(v => v.level === level);
     const bHasLevel = b.variants && b.variants.some(v => v.level === level);
@@ -2845,6 +2844,7 @@ function applyReview() {
 if(window.speechSynthesis){window.speechSynthesis.getVoices();window.speechSynthesis.onvoiceschanged=()=>window.speechSynthesis.getVoices();}
 
 // Check for preset launch
+let presetHandled = false;
 (function checkPresetMode() {
   const params = new URLSearchParams(window.location.search);
   if (params.get('preset') !== '1') return;
@@ -2853,14 +2853,14 @@ if(window.speechSynthesis){window.speechSynthesis.getVoices();window.speechSynth
     const savedWiz = JSON.parse(localStorage.getItem('homeWorkout_presetWiz') || 'null');
     if (!savedWiz) return;
     localStorage.removeItem('homeWorkout_presetWiz');
-    // Apply preset wiz and build immediately
     wiz = { ...wiz, ...savedWiz };
     buildProgram();
-  } catch(e) {}
+    presetHandled = true;
+  } catch(e) { console.error('Preset error:', e); }
 })();
 (function checkQuickMode() {
   const params = new URLSearchParams(window.location.search);
-  if (params.get('quick') !== '1') { init(); return; }
+  if (params.get('quick') !== '1') { if (!presetHandled) init(); return; }
   const focus = params.get('focus') || 'full';
   const mins = parseInt(params.get('mins')) || 15;
   const sessionCfg = {10:{rounds:2,exCount:4},15:{rounds:3,exCount:4},20:{rounds:3,exCount:5},30:{rounds:4,exCount:6}}[mins] || {rounds:3,exCount:4};
