@@ -605,51 +605,29 @@ footer {
 
 const VERSIONS = [
   {
-    version: '2.0',
+    version: '0.1',
     date: 'June 2026',
     tag: 'latest',
     breaking: false,
     changes: [
-      'Per-day progression — adjust movement complexity, rounds, and reps independently each week',
-      'Week review prompt — triggers automatically when a week is complete',
-      'Exercises computed live per week — progression is now visible week to week',
-      'Single rep targets replace ranges — clear goal each session',
-      'Numbered step-by-step guides for all exercises and stretches',
-      'Stretch progress tracking with auto-other-side timer',
-      'Richer stretch descriptions explaining the physiology',
-      'Version migration system — updates no longer break saved programs',
-    ]
-  },
-  {
-    version: '1.5',
-    date: 'May 2026',
-    tag: 'stable',
-    breaking: false,
-    changes: [
+      'Program builder — 8-step wizard covering weeks, days, session length, equipment, focus per day, level, cooldown, and progression',
+      '54-exercise library across push, pull, hinge, squat, core, carry, mobility, and power',
+      'Dynamic Progression — reps, holds, and rounds increase automatically each week with variant step-ups mid-program',
+      'Per-day progression review after each completed week — adjust movement complexity, rounds, and reps independently per day',
       'Round counter per exercise — tap after each round, pips fill as you go',
-      'Exercise swap — replace any exercise this week or all remaining weeks',
-      'Edit program mid-run without losing progress',
-      'Spoken timer countdown (3, 2, 1, Go) with auto-other-side for stretches',
-      'New design — Bebas Neue typography, orange-red palette',
-    ]
-  },
-  {
-    version: '1.0',
-    date: 'April 2026',
-    tag: 'stable',
-    breaking: false,
-    changes: [
-      'Initial release — 8-step program builder wizard',
-      'Weekly auto-progression with phase system',
-      'Exercise library with form cues and explanations',
-      'Cooldown stretches matched to each day focus',
-      'Timer with spoken countdown',
-      'localStorage save — progress persists across sessions',
+      'Numbered step-by-step form guides for every exercise and stretch',
+      'Cooldown stretches matched to each day\'s focus with auto-other-side timer',
+      'Exercise swap — replace any exercise for this week or all remaining weeks',
+      'Skip, cardio, and rest day logging per session',
+      'Spoken countdown timer — 3, 2, 1, Go and end countdown',
+      'Quick Workout — standalone session with no program setup required',
+      'Progress saves in your browser — each person has their own independent data',
+      'Version migration system — future updates won\'t break saved programs',
     ]
   },
 ];
 
-const CURRENT_VERSION = VERSIONS[0].version;
+const CURRENT_VERSION = '0.1';
 const LS_SPLASH_KEY = 'homeWorkout_splash';
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
