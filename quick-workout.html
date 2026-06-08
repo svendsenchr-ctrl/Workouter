@@ -336,6 +336,119 @@ const LIBRARY = [
    what:'Ballistic hip hinge for explosive full-body conditioning.',why:'Efficient full-body power output.',
    cues:'Hinge at the hip to grip the KB.|Hike it back between your legs then drive hips forward explosively.|Let the KB float to shoulder height from hip power.|Control the descent and load the hips for the next rep.',
    label:'20 reps'},
+  // ── HINGE ──
+  {id:'hip_thrust',name:'Hip Thrust',pattern:'hinge',equip:['bw','bench'],
+   what:'Upper back on bench, drive hips up until body is straight from knees to shoulders.',
+   why:'Most effective glute isolation exercise — reaches full hip extension that other hinges cannot.',
+   cues:'Upper back rests on edge of a bench.|Feet flat, hip-width apart, knees at 90° at top.|Drive through heels, squeeze glutes hard at top.|Keep chin tucked — do not hyperextend lower back.',
+   label:'12 reps'},
+  {id:'single_leg_glute_bridge',name:'Single-Leg Glute Bridge',pattern:'hinge',equip:['bw'],
+   what:'Glute bridge on one leg — double the demand on each glute.',
+   why:'Fixes left-right glute imbalances. Transfers to running and hinging.',
+   cues:'Lie on back, one knee bent, one leg extended.|Press through heel of bent leg to drive hip up.|Keep both hips level — do not let the raised side drop.|Squeeze glute hard at top for 1–2 seconds.',
+   label:'10 reps each side'},
+  {id:'good_morning',name:'Good Morning',pattern:'hinge',equip:['bw'],
+   what:'Hands behind head, hinge forward with flat back, return to standing.',
+   why:'Teaches the hip hinge pattern with zero load. Builds hamstring flexibility.',
+   cues:'Stand with feet shoulder-width apart, hands behind head.|Push hips back and hinge forward — back flat, chest up.|Lower until you feel a hamstring stretch.|Drive hips forward to return.',
+   label:'12 reps'},
+  {id:'donkey_kick',name:'Donkey Kick',pattern:'hinge',equip:['bw'],
+   what:'On hands and knees, drive one heel toward the ceiling squeezing the glute.',
+   why:'Isolates glute medius and maximus — builds mind-muscle connection.',
+   cues:'Hands and knees — hands under shoulders, knees under hips.|Keep knee bent at 90°.|Drive right heel toward ceiling, squeezing glute at top.|Keep hips square — do not rotate.',
+   label:'15 reps each side'},
+  // ── SQUAT ──
+  {id:'jump_squat',name:'Jump Squat',pattern:'squat',equip:['bw'],
+   what:'Bodyweight squat followed by explosive jump, landing softly.',
+   why:'Develops lower body power and explosiveness.',
+   cues:'Feet shoulder-width, squat down.|Drive explosively and jump as high as possible.|Land softly with bent knees — absorb through hips and ankles.|Immediately lower into next squat.',
+   label:'10 reps'},
+  {id:'lateral_squat',name:'Lateral Squat',pattern:'squat',equip:['bw'],
+   what:'Shift weight to one side and lower into single-leg squat while other leg stays straight.',
+   why:'Trains the frontal plane — completely ignored by standard squats.',
+   cues:'Stand with feet wider than shoulder-width.|Shift weight right, push hips back and down.|Lower until right thigh is roughly parallel — left leg stays straight.|Push through right heel to return.',
+   label:'8 reps each side'},
+  {id:'step_up',name:'Step-Up',pattern:'squat',equip:['bw','bench'],
+   what:'Step onto a box with one foot and drive through that heel to stand on top.',
+   why:'Develops unilateral leg strength with very low injury risk.',
+   cues:'Place right foot fully on the surface.|Drive through right heel to stand on top — do not push off back foot.|Step back down with control.|Complete all reps before switching.',
+   label:'10 reps each leg'},
+  {id:'wall_sit',name:'Wall Sit',pattern:'squat',equip:['bw'],timed:true,secs:35,
+   what:'Back against wall, thighs parallel to floor, hold isometrically.',
+   why:'Builds quad endurance and isometric strength at the squat sticking point.',
+   cues:'Back flat against wall.|Walk feet forward until thighs are parallel to floor.|Knees directly above ankles.|Hold for prescribed time.',
+   label:'35 sec'},
+  // ── CARRY ──
+  {id:'bear_crawl',name:'Bear Crawl',pattern:'carry',equip:['bw'],
+   what:'Hands and feet with knees hovering 1–2 cm off floor, crawl forward keeping back flat.',
+   why:'Trains core stability, shoulder strength, hip flexors, and coordination. No equipment needed.',
+   cues:'Lift knees 1–2 cm off floor — keep them low.|Back completely flat — hips neither high nor sagging.|Right hand and left foot move together.|Move slowly and deliberately.',
+   label:'15m forward and back'},
+  {id:'farmers_carry_bw',name:'Single-Leg Balance Hold',pattern:'carry',equip:['bw'],
+   what:'Stand on one leg with arm at side as if carrying a heavy load.',
+   why:'Trains anti-lateral-flexion demand of carries without equipment.',
+   cues:'Stand tall on your right foot, left foot slightly lifted.|Hold left arm at side as if carrying something heavy.|Resist any lateral lean — keep shoulders level.',
+   timed:true,secs:25,
+   label:'25 sec each side'},
+  // ── PULL ──
+  {id:'prone_ytw',name:'Prone Y-T-W',pattern:'pull',equip:['bw'],
+   what:'Lie face-down, move arms through Y, T, and W shapes squeezing upper back at each.',
+   why:'Targets lower trap, rhomboids, and rear deltoids — essential for shoulder health.',
+   cues:'Lie face-down, arms overhead (Y).|Lift arms off floor by squeezing upper back — thumbs up.|Move to T (arms out sides) then W (elbows bent, hands by ears).|Each position is one rep. Feel the squeeze.',
+   label:'6 reps each position'},
+  {id:'towel_row',name:'Towel Row',pattern:'pull',equip:['bw'],
+   what:'Loop a towel around a door handle, lean back, and row your chest to the door.',
+   why:'Bodyweight horizontal pull that works anywhere with no bar needed.',
+   cues:'Loop towel around door handle at waist height.|Hold both ends, lean back until arms are straight.|Body in a straight line — brace like a plank.|Pull chest toward handle, leading with elbows.|Lower slowly.',
+   label:'12 reps'},
+  // ── MOBILITY ──
+  {id:'world_greatest',name:"World's Greatest Stretch",pattern:'mobility',equip:['bw'],
+   what:'Lunge + same-side hand inside foot + rotate and reach opposite arm up + reach under.',
+   why:'Hits hip flexors, thoracic spine, hamstrings, and shoulders in one movement.',
+   cues:'Step right foot forward into a lunge.|Right hand on floor inside right foot.|Rotate and reach left arm up. Hold 2 seconds.|Reach left arm under your body.|Return to standing and switch.',
+   label:'5 reps each side'},
+  {id:'hip_circles',name:'Hip Circles',pattern:'mobility',equip:['bw'],
+   what:'Stand on one leg and draw large circles with your raised knee.',
+   why:'Lubricates the hip joint and maintains full range of motion.',
+   cues:'Stand on one foot, hold something for balance if needed.|Draw the biggest circle possible with your raised knee.|Go slowly through the full range.|10 forward, 10 backward. Switch legs.',
+   label:'10 reps each direction each leg'},
+  {id:'thoracic_rotation',name:'Thoracic Rotation',pattern:'mobility',equip:['bw'],
+   what:'Lie on side, knees at 90°, rotate top arm and shoulder back toward floor.',
+   why:'Restores thoracic rotation — the most commonly restricted movement.',
+   cues:'Lie on side, knees stacked at 90°.|Bottom hand on top knee to keep hips still.|Rotate top arm back, tracing a large arc overhead.|Try to get shoulder blade to touch the floor. Hold 2 seconds.',
+   label:'8 reps each side'},
+  {id:'ninety_ninety',name:'90/90 Hip Rotation',pattern:'mobility',equip:['bw'],
+   what:'Sit with both legs at 90°, then rotate both legs to the opposite side.',
+   why:'Develops active hip internal and external rotation — rarely trained but critical.',
+   cues:'Right leg in front (shin parallel to torso), left leg to the side.|Rotate both legs simultaneously to the left.|Keep spine tall throughout.|Control the movement — do not flop.',
+   label:'8 reps each direction'},
+  // ── POWER ──
+  {id:'broad_jump',name:'Broad Jump',pattern:'power',equip:['bw'],
+   what:'Two-footed horizontal jump for maximum distance, landing softly.',
+   why:'Develops explosive leg power in the horizontal plane.',
+   cues:'Feet shoulder-width, hinge and swing arms back.|Drive arms forward and jump as far as possible.|Land on both feet with soft bent knees.|Walk back and reset.',
+   label:'6 reps'},
+  {id:'burpee',name:'Burpee',pattern:'power',equip:['bw'],
+   what:'Squat, plank, push-up, jump — a full-body sequence in one movement.',
+   why:'Most efficient bodyweight exercise for power endurance.',
+   cues:'Squat down and place hands on floor.|Jump feet back into plank. Push-up (optional).|Jump feet back to hands.|Drive up and jump with arms overhead.',
+   label:'8 reps'},
+  {id:'lateral_hop',name:'Lateral Hop',pattern:'power',equip:['bw'],
+   what:'Jump laterally from one foot to the other, sticking each landing.',
+   why:'Develops frontal plane power and single-leg landing mechanics.',
+   cues:'Stand on right foot.|Push off and jump to the left, landing on left foot only.|Absorb landing with soft bent knee — stick it 1 second.|Jump back to right. Stay light.',
+   label:'10 reps each side'},
+  // ── CORE ──
+  {id:'bear_hold',name:'Bear Hold',pattern:'core',equip:['bw'],timed:true,secs:25,
+   what:'Hands and knees, lift knees 1–2 cm off floor and hold without moving.',
+   why:'Trains deep core stabilisers. Deceptively hard for beginners.',
+   cues:'Hands under shoulders, knees under hips.|Tuck toes under and lift knees 1–2 cm off floor.|Back completely flat — no sagging or rising hips.|Brace hard. Breathe steadily.',
+   label:'25 sec'},
+  {id:'copenhagen_plank',name:'Copenhagen Plank',pattern:'core',equip:['bw','bench'],timed:true,secs:20,
+   what:'Side plank with top foot on bench — entire load on adductors and lateral core.',
+   why:'Most effective adductor exercise without equipment. Reduces groin injury risk.',
+   cues:'Top foot rests on bench or chair.|Lift hips off floor, support on forearm and top foot.|Straight lateral line — do not rotate.|Bottom leg hangs free.',
+   label:'20 sec each side'},
 ];
 
 const STRETCHES = {
@@ -424,29 +537,50 @@ function updateGoBtn() {
 // ─── BUILD WORKOUT ────────────────────────────────────────────────────────────
 function buildWorkout() {
   const cfg = {10:{rounds:2,count:4},15:{rounds:3,count:4},20:{rounds:3,count:5},30:{rounds:4,count:6}}[selectedMins] || {rounds:3,count:4};
+
+  // Strict pattern mapping — only pick from these patterns, no unrelated backfill
   const patternMap = {
-    full:['push','hinge','squat','core','pull'],
-    push:['push','core'],pull:['pull','core'],hinge:['hinge','core'],
-    squat:['squat','core'],core:['core','carry','mobility'],
-    mobility:['mobility','core'],power:['power','hinge','push'],
+    full:    ['push','hinge','squat','core','pull','carry'],
+    push:    ['push','core','carry'],
+    pull:    ['pull','core','hinge'],
+    hinge:   ['hinge','squat','core'],
+    squat:   ['squat','hinge','core'],
+    core:    ['core','carry','mobility'],
+    mobility:['mobility','core'],
+    power:   ['power','hinge','push'],
   };
   const patterns = patternMap[selectedFocus] || ['push','pull','hinge','core'];
+
   const available = LIBRARY.filter(ex =>
     !ex.equip || ex.equip.length === 0 || ex.equip.some(e => selectedEquip.includes(e))
   );
+
+  // Only pick from allowed patterns — no fallback to unrelated ones
+  const allowedPool = available.filter(e => patterns.includes(e.pattern));
   const picked = [], usedIds = new Set();
-  for (const pattern of patterns) {
+
+  // Pick up to 2 from primary pattern first
+  const primary = patterns[0];
+  allowedPool.filter(e => e.pattern === primary && !usedIds.has(e.id))
+    .slice(0, 2)
+    .forEach(e => { picked.push(e); usedIds.add(e.id); });
+
+  // Fill from remaining allowed patterns
+  for (const pattern of patterns.slice(1)) {
     if (picked.length >= cfg.count) break;
-    const pool = available.filter(e => e.pattern === pattern && !usedIds.has(e.id));
+    const pool = allowedPool.filter(e => e.pattern === pattern && !usedIds.has(e.id));
     if (pool.length) { picked.push(pool[0]); usedIds.add(pool[0].id); }
   }
-  while (picked.length < cfg.count) {
-    const rem = available.filter(e => !usedIds.has(e.id));
-    if (!rem.length) break;
-    picked.push(rem[0]); usedIds.add(rem[0].id);
+
+  // If still short, repeat from primary pool
+  if (picked.length < cfg.count) {
+    allowedPool.filter(e => !usedIds.has(e.id))
+      .slice(0, cfg.count - picked.length)
+      .forEach(e => { picked.push(e); usedIds.add(e.id); });
   }
+
   workout = {
-    exercises: picked,
+    exercises: picked.slice(0, cfg.count),
     rounds: cfg.rounds,
     stretches: STRETCHES[selectedFocus] || STRETCHES.full,
   };
