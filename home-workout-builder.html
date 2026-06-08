@@ -2489,10 +2489,9 @@ if(window.speechSynthesis){window.speechSynthesis.getVoices();window.speechSynth
 // Check for quick workout launch params
 (function checkQuickMode() {
   const params = new URLSearchParams(window.location.search);
-  if (params.get('quick') !== '1') return;
+  if (params.get('quick') !== '1') { init(); return; }
   const focus = params.get('focus') || 'full';
   const mins = parseInt(params.get('mins')) || 15;
-  // Build a single-week quick program and launch straight into it
   const sessionCfg = {10:{rounds:2,exCount:4},15:{rounds:3,exCount:4},20:{rounds:3,exCount:5},30:{rounds:4,exCount:6}}[mins] || {rounds:3,exCount:4};
   const exIds = selectExerciseIds(focus, ['bw','kb_light','kb_heavy','bar','bench'], 'intermediate', sessionCfg.exCount);
   const focusLabels = {full:'Full Body',push:'Upper Push',core:'Core & Carry',hinge:'Lower Body',mobility:'Mobility',pull:'Pull & Back'};
@@ -2511,12 +2510,12 @@ if(window.speechSynthesis){window.speechSynthesis.getVoices();window.speechSynth
     }]
   };
   tracker = ensureTrackerShape({currentWeek:1,currentDayTab:1,checked:{},sections:{}});
-  // Remove URL params without reload
   history.replaceState(null,'',window.location.pathname);
-  showTracker();
+  // Don't call init() — go straight to tracker without saving
+  document.getElementById('reset-btn').style.display = 'block';
+  document.getElementById('edit-btn').style.display = 'none';
+  renderTracker();
 })();
-
-init();
 </script>
 </body>
 </html>
