@@ -83,6 +83,21 @@ header{background:var(--ink);padding:14px 16px;display:flex;align-items:center;j
 .btn-build:hover{background:#e03000;}
 .btn-build:disabled{opacity:0.25;cursor:not-allowed;}
 
+.day-picker-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:14px;}
+.day-pick-btn{padding:10px 2px;text-align:center;border-radius:8px;border:2px solid var(--border);background:var(--surface);cursor:pointer;user-select:none;transition:all 0.15s;}
+.day-pick-btn .dpn{font-family:'Bebas Neue',sans-serif;font-size:0.9rem;letter-spacing:0.04em;color:var(--muted);}
+.day-pick-btn.selected{background:#fff5f2;border-color:var(--accent);}
+.day-pick-btn.selected .dpn{color:var(--accent);}
+.day-count-note{font-size:0.72rem;color:var(--muted);margin-bottom:12px;}
+
+.equip-toggles{display:flex;flex-direction:column;gap:7px;margin-bottom:14px;}
+.equip-tog{display:flex;align-items:center;gap:10px;padding:10px 13px;border:2px solid var(--border);border-radius:9px;background:var(--surface);cursor:pointer;user-select:none;transition:all 0.15s;}
+.equip-tog.selected{border-color:var(--accent);background:#fff5f2;}
+.equip-tog-check{width:20px;height:20px;border-radius:4px;border:2px solid var(--border);background:transparent;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0.7rem;color:transparent;transition:all 0.15s;}
+.equip-tog.selected .equip-tog-check{background:var(--accent);border-color:var(--accent);color:#fff;}
+.equip-tog-label{font-weight:600;font-size:0.82rem;color:var(--ink);}
+.equip-tog-sub{font-size:0.68rem;color:var(--muted);}
+
 .or-divider{text-align:center;font-size:0.72rem;color:var(--muted);margin:6px 0;letter-spacing:0.06em;text-transform:uppercase;}
 </style>
 </head>
@@ -233,7 +248,7 @@ const PRESETS = {
 };
 
 // Adjustable settings
-const ADJ_DAYS_OPTIONS = [2,3,4,5,6];
+
 const ADJ_MINS_OPTIONS = [10,15,20,30];
 const ADJ_WEEKS_OPTIONS = [4,6,8,10,12,16];
 const ADJ_LEVEL_OPTIONS = ['beginner','intermediate','advanced'];
@@ -277,11 +292,18 @@ function selectPreset(category, name) {
   if (!cfg) return;
 
   currentPreset = { category, name, cfg: {...cfg} };
+  // Auto-assign days spaced evenly across the week
+  const numDays = cfg.days;
+  const spacing = Math.floor(7 / numDays);
+  const autoDays = Array.from({length:numDays}, (_,i) => (i * spacing) % 7).sort((a,b)=>a-b);
+
   adjustments = {
     days: cfg.days,
+    selectedDays: autoDays,
     sessionMins: cfg.sessionMins,
     weeks: 10,
     level: 'intermediate',
+    equipment: [...cfg.equipment],
     cooldown: cfg.cooldown || 'yes',
     progression: cfg.progression || 'auto',
   };
@@ -311,20 +333,53 @@ function renderSummary(category, name, cfg) {
   `;
 }
 
+const DAYS_OF_WEEK = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
 function renderAdjustments(category) {
   const el = document.getElementById(`adj-${category}`);
+
+  // Build day picker
+  const dayPickerHtml = `
+    <div class="adj-title" style="margin-bottom:8px">Which days?</div>
+    <div class="day-picker-grid" id="day-picker-${category}">
+      ${DAYS_OF_WEEK.map((d,i) => `
+        <div class="day-pick-btn ${adjustments.selectedDays && adjustments.selectedDays.includes(i)?'selected':''}"
+          data-day="${i}" onclick="toggleDay('${category}',${i})">
+          <div class="dpn">${d}</div>
+        </div>`).join('')}
+    </div>
+    <div class="day-count-note" id="day-count-${category}">${(adjustments.selectedDays||[]).length} day${(adjustments.selectedDays||[]).length!==1?'s':''} selected</div>`;
+
+  // Build equipment picker
+  const equipDefs = [
+    {val:'bw',      label:'Bodyweight',              sub:'Always available'},
+    {val:'kb_light',label:'Light Kettlebell (8–12 kg)',sub:'Goblet squats, carries, halos'},
+    {val:'kb_heavy',label:'Heavy Kettlebell (14–24 kg)',sub:'Deadlifts, cleans, swings'},
+    {val:'bar',     label:'Pull-up Bar',              sub:'Pull-ups, inverted rows'},
+    {val:'bench',   label:'Bench / Chair',            sub:'Dips, elevated push-ups'},
+  ];
+  const equipHtml = `
+    <div class="adj-title" style="margin-top:16px;margin-bottom:8px">Equipment available</div>
+    <div class="equip-toggles">
+      ${equipDefs.map(e => `
+        <div class="equip-tog ${(adjustments.equipment||[]).includes(e.val)?'selected':''}"
+          data-equip="${e.val}" onclick="toggleEquipAdj('${category}','${e.val}')">
+          <div class="equip-tog-check">${(adjustments.equipment||[]).includes(e.val)?'✓':''}</div>
+          <div>
+            <div class="equip-tog-label">${e.label}</div>
+            <div class="equip-tog-sub">${e.sub}</div>
+          </div>
+        </div>`).join('')}
+    </div>`;
+
   el.innerHTML = `
-    <div class="adj-title">Adjust if needed</div>
+    ${dayPickerHtml}
+    ${equipHtml}
+    <div class="adj-title" style="margin-top:16px;margin-bottom:8px">Program settings</div>
     <div class="adj-row">
       <div class="adj-label">Program length</div>
       <select class="adj-select" onchange="updateAdj('weeks',this.value)">
         ${ADJ_WEEKS_OPTIONS.map(w => `<option value="${w}" ${w===adjustments.weeks?'selected':''}>${w} weeks</option>`).join('')}
-      </select>
-    </div>
-    <div class="adj-row">
-      <div class="adj-label">Days per week</div>
-      <select class="adj-select" onchange="updateAdj('days',this.value)">
-        ${ADJ_DAYS_OPTIONS.map(d => `<option value="${d}" ${d===adjustments.days?'selected':''}>${d} days</option>`).join('')}
       </select>
     </div>
     <div class="adj-row">
@@ -352,8 +407,42 @@ function renderAdjustments(category) {
         <option value="auto" ${adjustments.progression==='auto'?'selected':''}>Dynamic — gets harder each week</option>
         <option value="fixed" ${adjustments.progression==='fixed'?'selected':''}>Fixed — same difficulty throughout</option>
       </select>
-    </div>
-  `;
+    </div>`;
+}
+
+function toggleDay(category, idx) {
+  if (!adjustments.selectedDays) adjustments.selectedDays = [];
+  const pos = adjustments.selectedDays.indexOf(idx);
+  if (pos >= 0) {
+    adjustments.selectedDays.splice(pos, 1);
+  } else {
+    adjustments.selectedDays.push(idx);
+    adjustments.selectedDays.sort((a,b) => a-b);
+  }
+  // Update UI
+  document.querySelectorAll(`#day-picker-${category} .day-pick-btn`).forEach(btn => {
+    const d = parseInt(btn.dataset.day);
+    btn.classList.toggle('selected', adjustments.selectedDays.includes(d));
+  });
+  const cnt = adjustments.selectedDays.length;
+  document.getElementById(`day-count-${category}`).textContent = `${cnt} day${cnt!==1?'s':''} selected`;
+}
+
+function toggleEquipAdj(category, val) {
+  if (val === 'bw') return; // always on
+  if (!adjustments.equipment) adjustments.equipment = ['bw'];
+  const pos = adjustments.equipment.indexOf(val);
+  if (pos >= 0) {
+    adjustments.equipment.splice(pos, 1);
+  } else {
+    adjustments.equipment.push(val);
+  }
+  // Update UI
+  document.querySelectorAll(`.equip-tog[data-equip="${val}"]`).forEach(tog => {
+    const on = adjustments.equipment.includes(val);
+    tog.classList.toggle('selected', on);
+    tog.querySelector('.equip-tog-check').textContent = on ? '✓' : '';
+  });
 }
 
 function updateAdj(key, val) {
@@ -365,14 +454,14 @@ function buildPreset(category) {
   if (!currentPreset) return;
   const { cfg } = currentPreset;
 
-  // Assign days of week — spread training days evenly across Mon-Sun
-  const numDays = adjustments.days || cfg.days;
-  const daySpacing = Math.floor(7 / numDays);
-  const selectedDays = [];
-  for (let i = 0; i < numDays; i++) {
-    selectedDays.push(i * daySpacing % 7);
-  }
-  selectedDays.sort((a,b) => a-b);
+  // Use explicitly selected days or fall back to auto-spaced
+  const selectedDays = adjustments.selectedDays && adjustments.selectedDays.length > 0
+    ? adjustments.selectedDays
+    : (() => {
+        const numDays = adjustments.days || cfg.days;
+        const spacing = Math.floor(7 / numDays);
+        return Array.from({length:numDays}, (_,i) => (i * spacing) % 7).sort((a,b)=>a-b);
+      })();
 
   // Assign focus to each day from pattern (cycling through)
   const pattern = cfg.dayFocusPattern;
@@ -386,7 +475,7 @@ function buildPreset(category) {
     weeks: adjustments.weeks || 10,
     days: selectedDays,
     sessionMins: adjustments.sessionMins || cfg.sessionMins,
-    equipment: cfg.equipment,
+    equipment: adjustments.equipment || cfg.equipment,
     dayFocus,
     level: adjustments.level || 'intermediate',
     cooldown: adjustments.cooldown || 'yes',

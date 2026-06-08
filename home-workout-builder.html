@@ -248,6 +248,11 @@ header{background:var(--ink);padding:14px 16px;display:flex;align-items:center;j
 .day-status-btn.active-skip{border-color:#e05a2b;background:#fff3ee;color:#c04000;}
 .day-status-btn.active-cardio{border-color:var(--blue);background:#f0f5ff;color:var(--blue);}
 .day-status-btn.active-rest{border-color:var(--muted);background:#f5f5f5;color:var(--muted);}
+.time-override-bar{display:flex;gap:5px;margin:8px 0 0;align-items:center;}
+.time-override-lbl{font-size:0.65rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);flex-shrink:0;}
+.time-pill{padding:5px 10px;border-radius:14px;border:2px solid var(--border);background:var(--surface);font-size:0.72rem;font-weight:700;color:var(--muted);cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+.time-pill:hover{border-color:var(--accent);color:var(--accent);}
+.time-pill.active{background:#fff5f2;border-color:var(--accent);color:var(--accent);}
 .day-skipped-msg{margin:14px 0 0;padding:14px 16px;border-radius:8px;border:2px solid #ffd0c0;background:#fff3ee;font-size:0.82rem;color:#c04000;font-weight:500;text-align:center;}
 .day-alt-msg{margin:14px 0 0;padding:14px 16px;border-radius:8px;border:2px solid #b0ccf0;background:#f0f5ff;font-size:0.82rem;color:var(--blue);font-weight:500;text-align:center;}
 
@@ -1802,15 +1807,24 @@ function getDayProgress(dayIndex) {
   return tracker.dayProgress[dayIndex] || { movementLevel:0, roundsOffset:0, repOffset:0 };
 }
 
-function weekProgression(weekNum, totalWeeks, progression, dayProg) {
+// Level config — controls how fast progression moves
+function getLevelConfig(level) {
+  return {
+    beginner:     { repIncEvery:2, secInc:3,  roundsEvery:4, variantAt:0.7 },
+    intermediate: { repIncEvery:1, secInc:5,  roundsEvery:3, variantAt:0.6 },
+    advanced:     { repIncEvery:1, secInc:8,  roundsEvery:2, variantAt:0.5 },
+  }[level] || { repIncEvery:1, secInc:5, roundsEvery:3, variantAt:0.6 };
+}
+
+function weekProgression(weekNum, totalWeeks, progression, dayProg, level) {
   const dp = dayProg || { movementLevel:0, roundsOffset:0, repOffset:0 };
+  const lc = getLevelConfig(level || program?.wiz?.level || 'intermediate');
 
   if (!isDynamic(progression)) {
-    // Fixed: only user-driven offsets apply
     return {
       roundsAdd: dp.roundsOffset,
       repAdd: dp.repOffset,
-      secAdd: dp.repOffset * 5,
+      secAdd: dp.repOffset * lc.secInc,
       variantStep: dp.movementLevel,
       isTest: false,
     };
@@ -1819,19 +1833,24 @@ function weekProgression(weekNum, totalWeeks, progression, dayProg) {
   const isTest = weekNum === totalWeeks;
   if (isTest) return { roundsAdd:-99, repAdd:0, secAdd:0, variantStep:dp.movementLevel, isTest:true };
 
-  // Base auto-progression curve
   const pos = (weekNum - 1) / Math.max(totalWeeks - 2, 1);
-  const baseRoundsAdd = Math.floor(pos * 2);      // base ramp: up to +2
-  const baseVariantStep = pos >= 0.6 ? 1 : 0;
-  const variantChangeWeek = Math.round((totalWeeks - 1) * 0.6);
-  const weekInBlock = baseVariantStep === 0 ? weekNum - 1 : weekNum - variantChangeWeek;
-  const baseRepAdd = Math.min(Math.max(weekInBlock, 0), 4);
-  const baseSecAdd = Math.min(Math.max(weekInBlock * 4, 0), 20);
 
-  // User offsets stack on top of base curve
-  const roundsAdd = Math.min(baseRoundsAdd + dp.roundsOffset, 3);
-  const repAdd = Math.min(baseRepAdd + dp.repOffset, 8);
-  const secAdd = Math.min(baseSecAdd + dp.repOffset * 5, 35);
+  // Rounds ramp — speed depends on level
+  const baseRoundsAdd = Math.floor(pos * (6 / lc.roundsEvery));
+
+  // Variant step — earlier for advanced
+  const baseVariantStep = pos >= lc.variantAt ? 1 : 0;
+  const variantChangeWeek = Math.round((totalWeeks - 1) * lc.variantAt);
+  const weekInBlock = baseVariantStep === 0 ? weekNum - 1 : weekNum - variantChangeWeek;
+
+  // Rep/sec increment — faster for advanced
+  const rawRepAdd = Math.floor(weekInBlock / lc.repIncEvery);
+  const baseRepAdd = Math.min(rawRepAdd, lc.repIncEvery === 1 ? 6 : 4);
+  const baseSecAdd = Math.min(weekInBlock * lc.secInc, 35);
+
+  const roundsAdd = Math.min(baseRoundsAdd + dp.roundsOffset, 4);
+  const repAdd = Math.min(baseRepAdd + dp.repOffset, 10);
+  const secAdd = Math.min(baseSecAdd + dp.repOffset * lc.secInc, 45);
   const variantStep = Math.min(baseVariantStep + dp.movementLevel, 2);
 
   return { roundsAdd, repAdd, secAdd, variantStep, isTest };
@@ -1902,18 +1921,29 @@ function selectExerciseIds(focus, equipment, level, count) {
   );
   const allowedPool = available.filter(e => patterns.includes(e.pattern));
   const picked = [], usedIds = new Set();
+  // Sort pool: beginner gets simpler variants first, advanced gets complex first
+  const levelOrder = ['beginner','intermediate','advanced'];
+  const levelIdx = levelOrder.indexOf(level || 'intermediate');
+  const sortedPool = [...allowedPool].sort((a, b) => {
+    const aHasLevel = a.variants && a.variants.some(v => v.level === level);
+    const bHasLevel = b.variants && b.variants.some(v => v.level === level);
+    if (aHasLevel && !bHasLevel) return -1;
+    if (!aHasLevel && bHasLevel) return 1;
+    return 0;
+  });
+
   // Up to 2 from primary pattern
-  allowedPool.filter(e => e.pattern === patterns[0] && !usedIds.has(e.id))
+  sortedPool.filter(e => e.pattern === patterns[0] && !usedIds.has(e.id))
     .slice(0, 2).forEach(e => { picked.push(e); usedIds.add(e.id); });
   // Fill from other allowed patterns
   for (const pattern of patterns.slice(1)) {
     if (picked.length >= count) break;
-    const pool = allowedPool.filter(e => e.pattern === pattern && !usedIds.has(e.id));
+    const pool = sortedPool.filter(e => e.pattern === pattern && !usedIds.has(e.id));
     if (pool.length) { picked.push(pool[0]); usedIds.add(pool[0].id); }
   }
   // Fill remaining from allowed pool only
   if (picked.length < count) {
-    allowedPool.filter(e => !usedIds.has(e.id))
+    sortedPool.filter(e => !usedIds.has(e.id))
       .slice(0, count - picked.length)
       .forEach(e => { picked.push(e); usedIds.add(e.id); });
   }
@@ -2173,12 +2203,32 @@ function getLiveExercises(day, w, d) {
   }).filter(Boolean);
 }
 
-// Get live rounds for a day
+// Get live rounds for a day — factoring in time override
 function getLiveRounds(day, w, d) {
   if (!day.exerciseIds) return day.rounds || day.baseRounds || 3;
   const dayProg = getDayProgressForWeek(d, w);
-  const prog = weekProgression(w, program.totalWeeks, program.wiz.progression, dayProg);
-  return prog.isTest ? 2 : Math.min(Math.max(day.baseRounds + prog.roundsAdd, 1), 5);
+  const prog = weekProgression(w, program.totalWeeks, program.wiz.progression, dayProg, program.wiz.level);
+  const baseRounds = prog.isTest ? 2 : Math.min(Math.max(day.baseRounds + prog.roundsAdd, 1), 5);
+
+  // Apply time override if set
+  const timeOverride = getDayTimeOverride(w, d);
+  if (!timeOverride) return baseRounds;
+
+  // Scale rounds proportionally to time override vs planned time
+  const plannedMins = program.wiz.sessionMins;
+  const ratio = timeOverride / plannedMins;
+  return Math.max(1, Math.round(baseRounds * ratio));
+}
+
+// Get live exercise count for a day — fewer exercises if time is short
+function getLiveExCount(day, w, d) {
+  const baseCount = day.exerciseIds ? day.exerciseIds.length : (day.exercises||[]).length;
+  const timeOverride = getDayTimeOverride(w, d);
+  if (!timeOverride) return baseCount;
+  const plannedMins = program.wiz.sessionMins;
+  if (timeOverride >= plannedMins) return baseCount; // more time = keep all
+  // Less time: reduce exercises proportionally, minimum 2
+  return Math.max(2, Math.round(baseCount * (timeOverride / plannedMins)));
 }
 
 
@@ -2205,8 +2255,10 @@ function renderDay() {
     return;
   }
 
-  const exercises = getLiveExercises(day, w, d);
+  const allExercises = getLiveExercises(day, w, d);
   const totalRounds = getLiveRounds(day, w, d);
+  const exCount = getLiveExCount(day, w, d);
+  const exercises = allExercises.slice(0, exCount);
   const total = exercises.length;
   const totalPips = total * totalRounds;
   const filledPips = exercises.reduce((sum, _, ei) => sum + Math.min(getRounds(w,d,ei), totalRounds), 0);
@@ -2214,7 +2266,10 @@ function renderDay() {
   const pct = totalPips > 0 ? Math.round((filledPips / totalPips) * 100) : 0;
   const sec = getSection(w,d);
   const dayStatus = getDayStatus(w, d);
-  const roundsNote = `${totalRounds} rounds · ${program.wiz.sessionMins} min session`;
+  const timeOverrideDisplay = getDayTimeOverride(w, d);
+  const roundsNote = timeOverrideDisplay
+    ? `${totalRounds} rounds · ${timeOverrideDisplay} min today (planned: ${program.wiz.sessionMins} min)`
+    : `${totalRounds} rounds · ${program.wiz.sessionMins} min session`;
 
   let html = `
     <div class="day-header">
@@ -2226,10 +2281,20 @@ function renderDay() {
       <div class="section-tab ${sec==='workout'?'active-workout':''}" onclick="switchSection('workout')">⚡ Workout</div>
       <div class="section-tab ${sec==='stretch'?'active-stretch':''}" onclick="switchSection('stretch')">🧘 Cooldown</div>
     </div>`;
+  const timeOverride = getDayTimeOverride(w, d);
+  const baseTime = program.wiz.sessionMins;
+  const timePills = [10,15,20,30].filter(t => t !== baseTime).map(t =>
+    `<button class="time-pill ${timeOverride===t?'active':''}" onclick="setDayTimeOverride(${t})">${t} min</button>`
+  ).join('');
   html += `<div class="day-status-bar">
     <button class="day-status-btn ${dayStatus==='skip'?'active-skip':''}" onclick="setDayStatus('skip')">⏭ Skip</button>
     <button class="day-status-btn ${dayStatus==='cardio'?'active-cardio':''}" onclick="setDayStatus('cardio')">🏃 Cardio</button>
     <button class="day-status-btn ${dayStatus==='rest'?'active-rest':''}" onclick="setDayStatus('rest')">😴 Rest</button>
+  </div>
+  <div class="time-override-bar">
+    <span class="time-override-lbl">Today:</span>
+    <button class="time-pill ${!timeOverride?'active':''}" onclick="setDayTimeOverride(null)">${baseTime} min ✓</button>
+    ${timePills}
   </div>`;
 
   if (dayStatus === 'skip') {
@@ -2824,4 +2889,52 @@ if(window.speechSynthesis){window.speechSynthesis.getVoices();window.speechSynth
 })();
 </script>
 </body>
-</html>
+</html>// Level config — controls progression speed
+function getLevelConfig(level) {
+  return {
+    beginner:     { repIncEvery:2, secInc:3, roundsMax:2, variantAt:0.7 },
+    intermediate: { repIncEvery:1, secInc:5, roundsMax:3, variantAt:0.6 },
+    advanced:     { repIncEvery:1, secInc:8, roundsMax:4, variantAt:0.5 },
+  }[level] || { repIncEvery:1, secInc:5, roundsMax:3, variantAt:0.6 };
+}
+
+function weekProgression(weekNum, totalWeeks, progression, dayProg, level) {
+  const dp = dayProg || { movementLevel:0, roundsOffset:0, repOffset:0 };
+  const lc = getLevelConfig(level || (typeof program !== 'undefined' && program?.wiz?.level) || 'intermediate');
+
+  if (!isDynamic(progression)) {
+    return {
+      roundsAdd: dp.roundsOffset,
+      repAdd: dp.repOffset,
+      secAdd: dp.repOffset * lc.secInc,
+      variantStep: dp.movementLevel,
+      isTest: false,
+    };
+  }
+
+  const isTest = weekNum === totalWeeks;
+  if (isTest) return { roundsAdd:-99, repAdd:0, secAdd:0, variantStep:dp.movementLevel, isTest:true };
+
+  const pos = (weekNum - 1) / Math.max(totalWeeks - 2, 1);
+
+  // Rounds: beginner ramps slowly, advanced faster
+  const baseRoundsAdd = Math.min(Math.floor(pos * (lc.roundsMax + 1)), lc.roundsMax);
+
+  // Variant step-up: earlier for advanced, later for beginner
+  const baseVariantStep = pos >= lc.variantAt ? 1 : 0;
+  const variantChangeWeek = Math.round((totalWeeks - 1) * lc.variantAt);
+  const weekInBlock = baseVariantStep === 0 ? weekNum - 1 : weekNum - variantChangeWeek;
+
+  // Reps: beginner adds every 2 weeks, intermediate/advanced every week
+  const baseRepAdd = Math.min(Math.floor(weekInBlock / lc.repIncEvery), 6);
+  const baseSecAdd = Math.min(weekInBlock * lc.secInc, 45);
+
+  const roundsAdd = Math.min(baseRoundsAdd + dp.roundsOffset, lc.roundsMax + dp.roundsOffset);
+  const repAdd = Math.min(baseRepAdd + dp.repOffset, 10);
+  const secAdd = Math.min(baseSecAdd + dp.repOffset * lc.secInc, 50);
+  const variantStep = Math.min(baseVariantStep + dp.movementLevel, 2);
+
+  return { roundsAdd, repAdd, secAdd, variantStep, isTest };
+}
+
+
