@@ -1364,18 +1364,12 @@ function buildProgram() {
   const weeks = [];
   for (let w = 1; w <= totalWeeks; w++) {
     const phase = phases.find(p => w >= p.startWeek && w <= p.endWeek);
-    const prog = weekProgression(w, totalWeeks, wiz.progression);
     const weekDays = [];
     for (let d = 0; d < 7; d++) {
       if (wiz.days.includes(d)) {
         const focus = wiz.dayFocus[d] || 'full';
         // Store only exercise IDs — formatting happens dynamically at render time
         const exerciseIds = selectExerciseIds(focus, wiz.equipment, wiz.level, sessionCfg.exCount);
-        // Rounds: base + weekly increment + user offset, min 1, max 5, test week = 2
-        const progForRounds = weekProgression(w, totalWeeks, wiz.progression, dayProg);
-        let rounds = progForRounds.isTest
-          ? 2
-          : Math.min(Math.max(sessionCfg.rounds + progForRounds.roundsAdd, 1), 5);
         weekDays.push({
           type: 'workout',
           dayName: DAYS_OF_WEEK[d],
