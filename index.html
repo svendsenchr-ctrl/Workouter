@@ -492,6 +492,39 @@ body {
 .quick-go-btn:hover { background: var(--accent); }
 .quick-go-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
+.entry-cards{display:flex;flex-direction:column;gap:10px;}
+.entry-card{background:var(--surface);border:2px solid var(--border);border-radius:12px;overflow:hidden;text-decoration:none;display:block;transition:border-color 0.15s;}
+.entry-card:hover{border-color:var(--accent);}
+.entry-card-inner{padding:18px;}
+.entry-card-top{display:flex;align-items:center;gap:12px;margin-bottom:6px;}
+.entry-card-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+.entry-card-icon.program{background:#fff5f2;border:2px solid #ffcca0;}
+.entry-card-icon.build{background:#f0faf5;border:2px solid #80d0a0;}
+.entry-card-icon.quick{background:#f5f0ff;border:2px solid #c0a0ff;}
+.entry-card-title{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:0.04em;color:var(--ink);}
+.entry-card-sub{font-size:0.75rem;color:var(--muted);line-height:1.5;margin-bottom:12px;}
+.entry-card-btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:6px;font-family:'Bebas Neue',sans-serif;font-size:0.9rem;letter-spacing:0.08em;transition:all 0.15s;}
+.entry-card-btn.primary{background:var(--accent);color:#fff;}
+.entry-card-btn.primary:hover{background:#e03000;}
+.entry-card-btn.secondary{background:var(--green);color:#fff;}
+.entry-card-btn.secondary:hover{background:#167a3e;}
+.entry-card-btn.tertiary{background:#6a3fa8;color:#fff;}
+.entry-card-btn.tertiary:hover{background:#5a2f98;}
+
+/* Program mini summary inside card */
+.program-mini{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);}
+.program-mini-stats{display:flex;gap:16px;margin-bottom:10px;}
+.pm-stat-val{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:0.04em;color:var(--accent);line-height:1;}
+.pm-stat-label{font-size:0.62rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-top:2px;}
+.pm-days{display:flex;gap:3px;margin-bottom:10px;}
+.pm-day{flex:1;padding:5px 2px;text-align:center;border-radius:4px;border:1.5px solid var(--border);background:var(--bg);}
+.pm-day .pd-name{font-family:'Bebas Neue',sans-serif;font-size:0.68rem;letter-spacing:0.04em;color:var(--muted);display:block;}
+.pm-day .pd-dot{width:5px;height:5px;border-radius:50%;background:var(--border);margin:3px auto 0;}
+.pm-day.done .pd-dot{background:var(--green);}
+.pm-day.rest{opacity:0.35;}
+.pm-progress-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:4px;}
+.pm-progress-fill{height:100%;background:var(--accent);border-radius:2px;}
+
 footer {
   padding: 20px;
   border-top: 1px solid var(--border);
@@ -519,8 +552,7 @@ footer {
     <div class="hero-label">Built for results</div>
     <h1 class="hero-title">Home<br><span class="accent">Workout</span></h1>
     <p class="hero-sub">A custom strength program that gets harder every week. Bodyweight + kettlebells. 10–30 minutes a day.</p>
-    <a href="home-workout-builder.html" class="hero-cta">Open App <span class="arrow">→</span></a>
-    <div class="version-badge">Version <span id="current-version-display">—</span></div>
+    <div class="version-badge" style="margin-top:0">Version <span id="current-version-display">—</span></div>
   </div>
 </div>
 
@@ -536,60 +568,14 @@ footer {
 
 <div class="content">
 
-  <!-- PROGRAM SUMMARY -->
-  <div class="section-label">Your Program</div>
-  <div id="program-section"></div>
+  <!-- THREE ENTRY POINTS -->
+  <div class="section-label">Where to</div>
+  <div id="entry-cards"></div>
 
-  <!-- QUICK WORKOUT -->
-  <div class="section-label">Quick Workout</div>
-  <div class="quick-card">
-    <div class="quick-card-inner">
-      <div class="quick-title">Just want to move?</div>
-      <div class="quick-sub">Pick a focus and duration — the app will jump straight into a session without a saved program.</div>
-      <div class="quick-options" id="quick-options">
-        <button class="quick-opt" data-focus="full" onclick="selectQuick(this)">
-          <div class="quick-opt-name">Full Body</div>
-          <div class="quick-opt-detail">Push + hinge + core</div>
-        </button>
-        <button class="quick-opt" data-focus="push" onclick="selectQuick(this)">
-          <div class="quick-opt-name">Upper Push</div>
-          <div class="quick-opt-detail">Chest, shoulders, triceps</div>
-        </button>
-        <button class="quick-opt" data-focus="core" onclick="selectQuick(this)">
-          <div class="quick-opt-name">Core & Carry</div>
-          <div class="quick-opt-detail">Anti-flexion + lateral</div>
-        </button>
-        <button class="quick-opt" data-focus="hinge" onclick="selectQuick(this)">
-          <div class="quick-opt-name">Lower Body</div>
-          <div class="quick-opt-detail">Hinge + glutes</div>
-        </button>
-        <button class="quick-opt" data-focus="mobility" onclick="selectQuick(this)">
-          <div class="quick-opt-name">Mobility</div>
-          <div class="quick-opt-detail">Movement + stretching</div>
-        </button>
-        <button class="quick-opt" data-focus="pull" onclick="selectQuick(this)">
-          <div class="quick-opt-name">Pull & Back</div>
-          <div class="quick-opt-detail">Rows + posterior chain</div>
-        </button>
-      </div>
-      <div class="quick-options" style="grid-template-columns:1fr 1fr 1fr;margin-bottom:14px" id="quick-time">
-        <button class="quick-opt" data-mins="10" onclick="selectQuickTime(this)">
-          <div class="quick-opt-name">10 min</div>
-        </button>
-        <button class="quick-opt selected" data-mins="15" onclick="selectQuickTime(this)">
-          <div class="quick-opt-name">15 min</div>
-        </button>
-        <button class="quick-opt" data-mins="20" onclick="selectQuickTime(this)">
-          <div class="quick-opt-name">20 min</div>
-        </button>
-      </div>
-      <button class="quick-go-btn" id="quick-go-btn" disabled onclick="launchQuickWorkout()">
-        Pick a focus above →
-      </button>
-    </div>
-  </div>
+  <!-- PROGRAM SUMMARY (shown inside entry-cards dynamically) -->
+  <div id="program-section" style="display:none"></div>
 
-  <!-- SHARE -->
+    <!-- SHARE -->
   <div class="section-label">Share</div>
   <div class="share-card">
     <div class="share-icon">🔗</div>
@@ -686,7 +672,7 @@ function init() {
   // Update last seen version
   saveSplashState({ ...splashState, lastSeenVersion: CURRENT_VERSION });
 
-  renderProgramSection(splashState);
+  renderEntryCards();
   renderChangelog();
 }
 
@@ -705,6 +691,85 @@ function dismissUpdate() {
 }
 
 // ─── PROGRAM SECTION ──────────────────────────────────────────────────────────
+function renderEntryCards() {
+  let savedProgram = null;
+  try {
+    const raw = localStorage.getItem('homeWorkoutBuilder');
+    if (raw) savedProgram = JSON.parse(raw);
+  } catch(e) {}
+
+  const hasProg = savedProgram && savedProgram.program && savedProgram.tracker;
+  const cards = document.getElementById('entry-cards');
+
+  let programCardHtml = '';
+  if (hasProg) {
+    const { program, tracker } = savedProgram;
+    const currentWeek = tracker.currentWeek || 1;
+    const totalWeeks = program.totalWeeks || 1;
+    const phase = (program.phases||[]).find(p => currentWeek >= p.startWeek && currentWeek <= p.endWeek);
+    const daysPerWeek = (program.wiz?.days||[]).length;
+
+    let totalPips=0,filledPips=0;
+    for(let w=1;w<=currentWeek;w++){
+      const wd=program.weeks[w-1];if(!wd)continue;
+      wd.days.forEach((day,d)=>{
+        if(day.type!=='workout')return;
+        const ec=day.exerciseIds?day.exerciseIds.length:(day.exercises||[]).length;
+        const rds=day.rounds||day.baseRounds||3;
+        totalPips+=ec*rds;
+        for(let ei=0;ei<ec;ei++){filledPips+=Math.min(tracker.checked[`${w}-${d}-${ei}`]||0,rds);}
+      });
+    }
+    const pct=totalPips>0?Math.round((filledPips/totalPips)*100):0;
+    const DAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    const wd=program.weeks[currentWeek-1];
+    const dayDots=wd?DAYS.map((name,d)=>{
+      const day=wd.days[d];
+      if(!day||day.type==='rest')return `<div class="pm-day rest"><span class="pd-name">${name}</span><div class="pd-dot"></div></div>`;
+      const ec=day.exerciseIds?day.exerciseIds.length:(day.exercises||[]).length;
+      const rds=day.rounds||day.baseRounds||3;
+      const filled=Array.from({length:ec},(_,ei)=>ei).reduce((s,ei)=>s+Math.min(tracker.checked[`${currentWeek}-${d}-${ei}`]||0,rds),0);
+      const done=filled>=ec*rds&&ec>0;
+      return `<div class="pm-day ${done?'done':''}"><span class="pd-name">${name}</span><div class="pd-dot"></div></div>`;
+    }).join(''):'';
+
+    programCardHtml = `
+      <div class="program-mini">
+        <div class="program-mini-stats">
+          <div><div class="pm-stat-val">${currentWeek}/${totalWeeks}</div><div class="pm-stat-label">Week</div></div>
+          <div><div class="pm-stat-val">${daysPerWeek}</div><div class="pm-stat-label">Days/wk</div></div>
+          <div><div class="pm-stat-val">${pct}%</div><div class="pm-stat-label">Done</div></div>
+        </div>
+        <div class="pm-days">${dayDots}</div>
+        <div class="pm-progress-bar"><div class="pm-progress-fill" style="width:${pct}%"></div></div>
+      </div>`;
+  }
+
+  cards.innerHTML = `
+    <div class="entry-card">
+      <div class="entry-card-inner">
+        <div class="entry-card-top">
+          <div class="entry-card-icon program">📋</div>
+          <div class="entry-card-title">${hasProg ? 'Your Program' : 'No Program Yet'}</div>
+        </div>
+        <div class="entry-card-sub">${hasProg ? 'Continue your custom program where you left off.' : 'Build a custom program tailored to your schedule, equipment, and level.'}</div>
+        ${hasProg ? programCardHtml : ''}
+        <a href="home-workout-builder.html" class="entry-card-btn ${hasProg?'primary':'secondary'}">${hasProg?'Continue →':'Build My Program →'}</a>
+        ${hasProg ? `&nbsp;<a href="home-workout-builder.html" class="entry-card-btn secondary" style="margin-left:6px">Edit</a>` : ''}
+      </div>
+    </div>
+    <div class="entry-card">
+      <div class="entry-card-inner">
+        <div class="entry-card-top">
+          <div class="entry-card-icon quick">⚡</div>
+          <div class="entry-card-title">Quick Workout</div>
+        </div>
+        <div class="entry-card-sub">Pick a focus and duration — jump straight into a session with no setup. Doesn't affect your saved program.</div>
+        <a href="quick-workout.html" class="entry-card-btn tertiary">Start Quick Workout →</a>
+      </div>
+    </div>`;
+}
+
 function renderProgramSection() {
   const section = document.getElementById('program-section');
   let saved = null;
