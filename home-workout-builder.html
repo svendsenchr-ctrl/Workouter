@@ -1259,7 +1259,7 @@ let wiz = {
 
 // ─── TRACKER STATE ───────────────────────────────────────────────────────────
 const LS_KEY = 'homeWorkoutBuilder';
-const CURRENT_VERSION = 2;
+const CURRENT_VERSION = 3;
 
 // ─── MIGRATIONS ──────────────────────────────────────────────────────────────
 // Each migration takes the raw saved object and returns an upgraded version.
@@ -1272,6 +1272,22 @@ const MIGRATIONS = {
     // v1 → v2: add dayProgress to tracker
     if (saved.tracker && !saved.tracker.dayProgress) {
       saved.tracker.dayProgress = {};
+    }
+    return saved;
+  },
+  2: (saved) => {
+    // v2 → v3: restore missing stretches on workout days
+    if (saved.program && saved.program.weeks) {
+      const cooldown = saved.program.wiz?.cooldown === 'yes';
+      saved.program.weeks.forEach(week => {
+        week.days.forEach((day, d) => {
+          if (day.type !== 'workout') return;
+          if (!day.stretches || day.stretches.length === 0) {
+            const focus = day.focus || 'full';
+            day.stretches = cooldown ? (STRETCHES[focus] || STRETCHES.full) : [];
+          }
+        });
+      });
     }
     return saved;
   },
@@ -2746,6 +2762,10 @@ function applyReview() {
       const focus = program.wiz.dayFocus[d] || 'full';
       weekDay.exerciseIds = selectExerciseIds(focus, program.wiz.equipment, program.wiz.level, sessionCfg.exCount);
       weekDay.baseRounds = sessionCfg.rounds;
+      // Preserve stretches — only rebuild exercise IDs
+      if (!weekDay.stretches) {
+        weekDay.stretches = program.wiz.cooldown === 'yes' ? (STRETCHES[focus] || STRETCHES.full) : [];
+      }
       delete weekDay.exercises;
       delete weekDay.rounds;
     }
