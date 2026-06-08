@@ -476,6 +476,7 @@ header{background:var(--ink);padding:14px 16px;display:flex;align-items:center;j
 
 <!-- TRACKER -->
 <div id="tracker">
+  <div id="debug-out" style="background:#ff0;color:#000;font-size:0.7rem;padding:8px;word-break:break-all;display:block"></div>
   <div class="week-selector">
     <div class="week-selector-label" id="week-selector-label">Program</div>
     <div class="week-grid" id="week-grid"></div>
@@ -1651,7 +1652,9 @@ function buildFocusRows() {
 
 // ─── PROGRAM BUILDER ─────────────────────────────────────────────────────────
 function buildProgram() {
-  console.log('[buildProgram] wiz.days:', wiz.days, 'wiz.dayFocus:', wiz.dayFocus, 'wiz.equipment:', wiz.equipment);
+  // DEBUG — remove after fix
+  const debugEl = document.getElementById('debug-out');
+  if (debugEl) debugEl.innerHTML = `days:${JSON.stringify(wiz.days)}<br>focus:${JSON.stringify(wiz.dayFocus)}<br>equip:${JSON.stringify(wiz.equipment)}<br>weeks:${wiz.weeks} mins:${wiz.sessionMins} level:${wiz.level}`;
   const totalWeeks = wiz.weeks;
   // If fixed or manual, use single flat phase
   let phases;
