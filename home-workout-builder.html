@@ -1337,6 +1337,7 @@ let openExp = {};
 
 // ─── INIT ────────────────────────────────────────────────────────────────────
 function init() {
+  if (presetHandled) return; // preset already built and showing
   let saved = null;
 
   try {
@@ -1545,8 +1546,14 @@ function showTracker() {
   document.getElementById('tracker').style.display = 'block';
   document.getElementById('reset-btn').style.display = 'block';
   document.getElementById('edit-btn').style.display = 'block';
-  // Reset build button label in case it was changed by edit
   document.getElementById('btn-build').textContent = 'Build My Program ✓';
+  // DEBUG
+  const debugEl = document.getElementById('debug-out');
+  if (debugEl && program) {
+    const w0 = program.weeks && program.weeks[0];
+    const workoutDays = w0 ? w0.days.filter(d=>d.type==='workout') : [];
+    debugEl.innerHTML = `totalWeeks:${program.totalWeeks} | wiz.days:${JSON.stringify(program.wiz?.days)} | week0 days:${w0?.days?.length} | workout days:${workoutDays.length} | exIds0:${JSON.stringify(workoutDays[0]?.exerciseIds?.slice(0,2))}`;
+  }
   renderTracker();
 }
 
@@ -2876,8 +2883,8 @@ let presetHandled = false;
     if (!savedWiz) return;
     localStorage.removeItem('homeWorkout_presetWiz');
     wiz = normaliseWizDays({ ...wiz, ...savedWiz });
-    buildProgram();
     presetHandled = true;
+    buildProgram();
   } catch(e) { console.error('Preset error:', e); }
 })();
 (function checkQuickMode() {
