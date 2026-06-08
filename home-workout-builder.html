@@ -1553,7 +1553,7 @@ function showTracker() {
     const w0 = program.weeks && program.weeks[0];
     const workoutDays = w0 ? w0.days.filter(d=>d.type==='workout') : [];
     const currentDay = w0 && w0.days[tracker.currentDayTab];
-    debugEl.innerHTML = `totalWeeks:${program.totalWeeks} | wiz.days:${JSON.stringify(program.wiz?.days)} | week0 days:${w0?.days?.length} | workout days:${workoutDays.length} | exIds0:${JSON.stringify(workoutDays[0]?.exerciseIds?.slice(0,2))} | currentDayTab:${tracker.currentDayTab} | currentDay.type:${currentDay?.type} | currentDay.focus:${currentDay?.focus}`;
+    debugEl.innerHTML = `totalWeeks:${program.totalWeeks} | wiz.days:${JSON.stringify(program.wiz?.days)} | week0 days:${w0?.days?.length} | workout days:${workoutDays.length} | exIds0:${JSON.stringify(workoutDays[0]?.exerciseIds?.slice(0,2))} | currentDayTab:${tracker.currentDayTab} | currentDay.type:${currentDay?.type} | currentDay.focus:${currentDay?.focus} | tabs.innerHTML.len:${document.getElementById('day-tabs')?.innerHTML?.length} | content.innerHTML.len:${document.getElementById('content')?.innerHTML?.length}`;
   }
   renderTracker();
 }
