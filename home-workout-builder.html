@@ -1760,7 +1760,10 @@ function renderWeekGrid() {
     const testNote = prog.isTest ? ' · Max effort — note your scores.' : '';
     progressNote = `<br><span style="opacity:0.8">Week ${tracker.currentWeek}: <strong>${liveRnds} rounds</strong>${variantNote}${testNote}</span>`;
   }
-  banner.innerHTML = (phase?.desc || '') + progressNote;
+  const progressionLabel = isDynamic(program.wiz.progression) ? 'Dynamic Progression' : 'Fixed Difficulty';
+  const progressionColor = isDynamic(program.wiz.progression) ? 'var(--accent)' : 'var(--muted)';
+  banner.innerHTML = (phase?.desc || '') + progressNote +
+    `<br><span style="font-size:0.68rem;opacity:0.7">Mode: <strong style="color:${progressionColor}">${progressionLabel}</strong> · <a href="#" onclick="editProgram();return false;" style="color:inherit;text-decoration:underline;">Change</a></span>`;
 }
 
 function isWeekDone(w) {
