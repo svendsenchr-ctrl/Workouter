@@ -482,9 +482,6 @@ function buildPreset(category) {
     progression: adjustments.progression || cfg.progression || 'auto',
   };
 
-  // Save to localStorage so builder can pick it up
-  const debugStr = `days:${JSON.stringify(wiz.days)}\nfocus:${JSON.stringify(wiz.dayFocus)}\nequip:${JSON.stringify(wiz.equipment)}\nweeks:${wiz.weeks} mins:${wiz.sessionMins} level:${wiz.level}`;
-  if (!confirm('DEBUG — wiz to be saved:\n\n' + debugStr + '\n\nProceed?')) return;
   try {
     localStorage.setItem('homeWorkout_presetWiz', JSON.stringify(wiz));
   } catch(e) {}

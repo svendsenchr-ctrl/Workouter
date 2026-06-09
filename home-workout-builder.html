@@ -476,7 +476,6 @@ header{background:var(--ink);padding:14px 16px;display:flex;align-items:center;j
 
 <!-- TRACKER -->
 <div id="tracker">
-  <div id="debug-out" style="background:#ff0;color:#000;font-size:0.7rem;padding:8px;word-break:break-all;display:block"></div>
   <div class="week-selector">
     <div class="week-selector-label" id="week-selector-label">Program</div>
     <div class="week-grid" id="week-grid"></div>
@@ -1547,14 +1546,6 @@ function showTracker() {
   document.getElementById('reset-btn').style.display = 'block';
   document.getElementById('edit-btn').style.display = 'block';
   document.getElementById('btn-build').textContent = 'Build My Program ✓';
-  // DEBUG
-  const debugEl = document.getElementById('debug-out');
-  if (debugEl && program) {
-    const w0 = program.weeks && program.weeks[0];
-    const workoutDays = w0 ? w0.days.filter(d=>d.type==='workout') : [];
-    const currentDay = w0 && w0.days[tracker.currentDayTab];
-    debugEl.innerHTML = `totalWeeks:${program.totalWeeks} | wiz.days:${JSON.stringify(program.wiz?.days)} | week0 days:${w0?.days?.length} | workout days:${workoutDays.length} | exIds0:${JSON.stringify(workoutDays[0]?.exerciseIds?.slice(0,2))} | currentDayTab:${tracker.currentDayTab} | currentDay.type:${currentDay?.type} | currentDay.focus:${currentDay?.focus} | tabs.innerHTML.len:${document.getElementById('day-tabs')?.innerHTML?.length} | content.innerHTML.len:${document.getElementById('content')?.innerHTML?.length}`;
-  }
   renderTracker();
 }
 
@@ -1660,9 +1651,6 @@ function buildFocusRows() {
 
 // ─── PROGRAM BUILDER ─────────────────────────────────────────────────────────
 function buildProgram() {
-  // DEBUG — remove after fix
-  const debugEl = document.getElementById('debug-out');
-  if (debugEl) debugEl.innerHTML = `days:${JSON.stringify(wiz.days)}<br>focus:${JSON.stringify(wiz.dayFocus)}<br>equip:${JSON.stringify(wiz.equipment)}<br>weeks:${wiz.weeks} mins:${wiz.sessionMins} level:${wiz.level}`;
   const totalWeeks = wiz.weeks;
   // If fixed or manual, use single flat phase
   let phases;
@@ -2064,11 +2052,9 @@ function renderCues(cues) {
 // ─── TRACKER RENDER ──────────────────────────────────────────────────────────
 function renderTracker() {
   if (!program) return;
-  try { renderWeekGrid(); } catch(e) { document.getElementById('debug-out').innerHTML += '<br>ERR WeekGrid:'+e.message; }
-  try { renderDayTabs(); } catch(e) { document.getElementById('debug-out').innerHTML += '<br>ERR DayTabs:'+e.message; }
-  try { renderDay(); } catch(e) { document.getElementById('debug-out').innerHTML += '<br>ERR Day:'+e.message; }
-  const dbg = document.getElementById('debug-out');
-  if (dbg) dbg.innerHTML += `<br>tabs.len:${document.getElementById('day-tabs')?.innerHTML?.length} | content.len:${document.getElementById('content')?.innerHTML?.length}`;
+  renderWeekGrid();
+  renderDayTabs();
+  renderDay();
 }
 
 function renderWeekGrid() {
