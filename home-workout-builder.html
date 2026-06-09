@@ -2067,6 +2067,8 @@ function renderTracker() {
   try { renderWeekGrid(); } catch(e) { document.getElementById('debug-out').innerHTML += '<br>ERR WeekGrid:'+e.message; }
   try { renderDayTabs(); } catch(e) { document.getElementById('debug-out').innerHTML += '<br>ERR DayTabs:'+e.message; }
   try { renderDay(); } catch(e) { document.getElementById('debug-out').innerHTML += '<br>ERR Day:'+e.message; }
+  const dbg = document.getElementById('debug-out');
+  if (dbg) dbg.innerHTML += `<br>tabs.len:${document.getElementById('day-tabs')?.innerHTML?.length} | content.len:${document.getElementById('content')?.innerHTML?.length}`;
 }
 
 function renderWeekGrid() {
