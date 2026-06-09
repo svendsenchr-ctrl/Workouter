@@ -2691,7 +2691,19 @@ function timerClose() {
 
 // ─── DAY STATUS ──────────────────────────────────────────────────────────────
 function dayStatusKey(w, d) { return `ds-${w}-${d}`; }
-function getDayStatus(w, d) { return tracker.dayStatus && tracker.dayStatus[dayStatusKey(w,d)] || null; }
+function dayTimeKey(w, d) { return `dt-${w}-${d}`; }
+function getDayStatus(w, d) { return (tracker.dayStatus && tracker.dayStatus[dayStatusKey(w,d)]) || null; }
+function getDayTimeOverride(w, d) { return (tracker.dayStatus && tracker.dayStatus[dayTimeKey(w,d)]) || null; }
+function setDayTimeOverride(mins) {
+  const w = tracker.currentWeek;
+  const d = tracker.currentDayTab;
+  const key = dayTimeKey(w, d);
+  if (!tracker.dayStatus) tracker.dayStatus = {};
+  const current = getDayTimeOverride(w, d);
+  tracker.dayStatus[key] = current === mins ? null : mins;
+  saveState();
+  renderDay();
+}
 
 function setDayStatus(status) {
   const w = tracker.currentWeek;
