@@ -2542,15 +2542,21 @@ function confirmSwap(exId, scope) {
 
   if (scope === 'this') {
     const weekDay = program.weeks[w-1].days[d];
-    if (weekDay && weekDay.type === 'workout' && weekDay.exercises[ei]) {
-      weekDay.exercises[ei] = formatExercise(newEx, program.wiz.level, program.weeks[w-1].phase, w, program.totalWeeks, program.wiz.progression, getDayProgress(d));
+    if (weekDay && weekDay.type === 'workout') {
+      if (weekDay.exerciseIds) weekDay.exerciseIds[ei] = exId;
+      else if (weekDay.exercises && weekDay.exercises[ei]) {
+        weekDay.exercises[ei] = formatExercise(newEx, program.wiz.level, program.weeks[w-1].phase, w, program.totalWeeks, program.wiz.progression, getDayProgress(d));
+      }
     }
     tracker.checked[ck(w, d, ei)] = 0;
   } else {
     for (let ww = w; ww <= program.totalWeeks; ww++) {
       const weekDay = program.weeks[ww-1].days[d];
-      if (weekDay && weekDay.type === 'workout' && weekDay.exercises[ei]) {
-        weekDay.exercises[ei] = formatExercise(newEx, program.wiz.level, program.weeks[ww-1].phase, ww, program.totalWeeks, program.wiz.progression, getDayProgress(d));
+      if (weekDay && weekDay.type === 'workout') {
+        if (weekDay.exerciseIds) weekDay.exerciseIds[ei] = exId;
+        else if (weekDay.exercises && weekDay.exercises[ei]) {
+          weekDay.exercises[ei] = formatExercise(newEx, program.wiz.level, program.weeks[ww-1].phase, ww, program.totalWeeks, program.wiz.progression, getDayProgress(d));
+        }
       }
     }
     tracker.checked[ck(w, d, ei)] = 0;
