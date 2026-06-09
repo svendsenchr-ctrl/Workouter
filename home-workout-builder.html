@@ -2064,9 +2064,9 @@ function renderCues(cues) {
 // ─── TRACKER RENDER ──────────────────────────────────────────────────────────
 function renderTracker() {
   if (!program) return;
-  renderWeekGrid();
-  renderDayTabs();
-  renderDay();
+  try { renderWeekGrid(); } catch(e) { document.getElementById('debug-out').innerHTML += '<br>ERR WeekGrid:'+e.message; }
+  try { renderDayTabs(); } catch(e) { document.getElementById('debug-out').innerHTML += '<br>ERR DayTabs:'+e.message; }
+  try { renderDay(); } catch(e) { document.getElementById('debug-out').innerHTML += '<br>ERR Day:'+e.message; }
 }
 
 function renderWeekGrid() {
